@@ -1,0 +1,118 @@
+/* WHERE Condition Operators */
+
+-- Comparison Operators (=,!=,>,>=,<,<=)
+
+-- = / equal to operator
+-- Retrieve all customers from Germany
+
+select * from customers
+where country = 'Germany';
+
+-- != / <> / not equal to operator
+--Retrieve all customers from Not from  Germany
+
+select * from customers
+where country != 'Germany';
+
+ -- > / greater than operator 
+-- Retrieve customers whose score is greater than 500
+select * from customers
+WHERE score > 500;
+
+ -- >= / greater than or equal to operator 
+-- Retrieve customers whose score is greater than or equal to  500
+select * from customers
+WHERE score >= 500;
+
+
+ -- < / Less than  operator 
+-- Retrieve customers whose score is less than 500
+select * from customers
+WHERE score < 500;
+
+
+ -- <= / Less than or equal to  operator 
+-- Retrieve customers whose score is less than or equal to  500
+select * from customers
+WHERE score <= 500;
+
+
+-- Logical Operator (AND, OR, NOT)
+
+-- AND Operator  - all conditions must be true
+-- Retrieve customers who are from the USA AND have a score greater than 500
+
+select * from customers
+where country = 'USA' AND score > 500;
+
+
+-- OR Operator - either of the two conditions must be true
+-- Retrieve customers who are from the USA OR have a score greater than 500
+
+select * from customers
+where country = 'USA' OR score > 500;
+
+-- NOT Operator - exclude matching rows
+-- Retrieve all customers with a score not less than 500
+
+select * from customers
+where NOT score  < 500;
+
+
+-- Range Operator
+
+-- BETWEEN Operator  - check if a value is within the range
+-- Retrieve customers whose score falls in the range between 100 and 500
+
+--select * from customers
+--where score >= 100 and score <= 500;
+
+select * from customers
+where score BETWEEN 100 and 500;
+
+-- Membership Operators
+
+-- IN Operator - checks if a value exists in a list
+-- Retrieve customers from either Germany or USA
+
+select * from customers
+where country IN ('Germany', 'USA');
+
+
+-- NOT IN Operator - checks if a value does NOT exist in a list
+-- Retrieve customers from either Germany or USA
+
+select * from customers
+where country NOT IN ('Germany', 'USA');
+
+-- Search Operator
+-- LIKE Operator - Searches for a pattern in text
+/*  LIKE     Pattern      %  (0,1,many)
+                          _ exact 1
+
+    M%      %in         %r%      __b%
+  Maria    Martin     Maria      Albert
+  Ma       Vin        Peter      Rob
+  M        in         Rayn       Abel    */
+
+
+
+-- Find all customers whose first name starts with 'M'
+
+select * from customers
+where firstname LIKE 'M%';
+
+-- Find all customers whose first name ends with 'n'
+select * from customers
+where firstname LIKE '%n';
+
+--find customers whose firstname contains 'e'
+
+select * from customers
+where firstname like '%e%';
+
+
+-- find customers whose firstname has 'r' in the 3rd position
+
+select * from customers
+where firstname like '__r%';
