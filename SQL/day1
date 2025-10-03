@@ -1,0 +1,64 @@
+--create database sql_learning;
+--use database sql_learning;
+
+--create schema learning;
+--use schema learning;
+
+-- load the tables in Snowflake under the learning schema
+/* click on learnings schema > select 3 dots > select load data > browse from the local machine and load the data by naming the tables *?
+
+
+-- Retrieve all customers' Data
+select * from customers;
+
+-- Retrieve all Employees' Data
+select * from EMPLOYEES;
+
+-- Retrieve all Orders' Data
+select * from Orders;
+
+-- Retrieve all OrdersArchive' Data
+select * from OrdersArchive;
+
+-- Retrieve all Products' Data
+select * from Products;
+
+
+--Retrieve each customer's name, country, and score
+select firstname, country, score from customers;
+
+--update the null value to zero
+update customers
+set score = 0
+where score is NULL;
+
+--Update the country name value to UK from USA for customerid 3
+update customers
+set Country = 'UK'
+where customerid = 3;
+
+--Retrieve customers with a score not equal to 0 
+select firstname, lastname, score from customers
+where score != 0; 
+
+
+-- Retrieve customers from Germany
+select firstname, lastname, score from customers
+where country = 'Germany'; 
+
+-- Retrieve all customers and sort the results by height score first
+select * from customers
+order by score DESC;
+
+-- Retrieve all customers and sort the results by lowest score first
+select * from customers
+order by score ASC;
+
+-- Retrieve all customers and sort the results by country and then by height score first
+select * from customers
+order by country ASC, Score DESC;
+
+
+-- find the total score by each country
+select firstname, country,sum(score) as total_score from customers
+group by country,firstname
