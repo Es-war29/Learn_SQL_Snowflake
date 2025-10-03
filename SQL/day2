@@ -1,0 +1,71 @@
+/* DDL Commands - Create, Alter, Drop */ 
+
+-- create a new table called persons with columns: id, person_name, birth_date, and phone
+
+CREATE OR REPLACE TABLE persons(
+    id INT NOT NULL PRIMARY KEY,
+    person_name VARCHAR(50) NOT NULL,
+    birth_date DATE,
+    phone VARCHAR(15) NOT NULL    
+)
+
+--  add a new  column email to the persons table
+
+ALTER TABLE persons
+ADD email VARCHAR(50) NOT NULL
+
+select * from persons;
+
+
+-- Remove the column phone from the persons table
+
+ALTER TABLE persons
+Drop  phone
+
+select * from persons;
+
+-- DELETE the table persons from the database
+
+Drop Table persons;
+
+
+/* DML Commands - INSERT, UPDATE, DELETE */
+
+
+INSERT INTO customers
+values 
+(6, 'Balajee', 'Pillalamarri', 'India',500),
+(7, 'Raj', NULL, 'India',520),
+(8, 'Gaman', 'Elie', 'UK',630),
+(9, 'Tejas', NULL, NULL, NULL);
+
+
+select * from customers;
+
+-- INSERT data from 'customers' into 'persons'
+
+create table persons(
+    id int,
+    FIRSTNAME VARCHAR(50),
+    LASTNAME VARCHAR(50),
+    COUNTRY VARCHAR (25),
+    SCORE int
+);
+
+INSERT into persons
+select * from customers;
+
+SELECT * FROM PERSONS;
+
+
+-- update the customer's firstname for the ID 6
+update CUSTOMERS
+SET customerID = 6
+WHERE FIRSTNAME = 'Eswar';
+
+select * from customers;
+
+-- Delete the customers where id is greater than 5 
+
+DELETE FROM  CUSTOMERS    
+WHERE customerid > 5;
