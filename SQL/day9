@@ -1,0 +1,545 @@
+/* 
+
+------- SQL Techniques ---------
+
+IN SQL, there are 5 Techniques to reduce and optimize the complexity of SQL queries
+
+SubQuery
+CTEs
+Views
+TMP Tables
+CTAS
+
+*/
+
+/* SubQuery */
+
+-- Subquery - Query inside another query
+
+/*  
+
+------------ Categories ------------
+
+1. Dependency  - Non-correlated Subquery
+               - Correlated subquery
+
+2. Result Type  - Scalar Subquery
+                - Row Subquery
+                - Table Subquery
+
+3. Location|clause  - SELECT Subquery
+                    - FROM Subquery
+                    - JOIN Subquery
+                    - WHERE Subquery -- Logical Operators - IN, ALL|ANY, EXISTS
+                                     -- Comparison Operators - =,!=,>,<,>=,<=
+
+*/
+
+-- Result Type Subqueries:
+
+-- Scalar Subquery - It can return one single value
+
+-- find the total number of orders
+SELECT
+    count(1) toatlorders
+FROM orders;
+
+select
+    avg(sales) avgsales
+from orders;
+
+-- Row Subquery - It will return multiple rows and one column
+
+select customerid from orders;
+
+-- Table Subquery - It will return multiple rows and multiple tables
+
+select * from orders;
+
+select orderid,orderdate from orders;
+
+
+-- Location| Clause Subqueries:
+
+-- FROM Clause Subquery - Used as a temporary table for the main query
+
+-- find the product that has a price higher than the average price of all products
+
+-- main query
+select 
+    * 
+from (
+    --subquery
+    select 
+        productid, price,
+        avg(price) over() avgprice
+    from products
+) t
+where price > avgprice;
+
+-- find the customer rank based on their total amount of sales 
+
+-- main query
+select 
+    *,
+    rank() over(order by totalsales desc) customerrank
+from (
+    -- subquery
+    select
+        customerid,
+        sum(sales) as totalsales
+    from orders
+    group by customerid
+) t;
+
+
+-- SELECT Clause Subquery - used to aggregate data side by side with the main query's data, allowing for direct comparison
+
+-- show the productID, names, prices, and total number of orders
+
+-- main query
+select
+    productid, product, price,
+    -- subquery
+    (select count(1) totalorders from orders) totalorders
+from products;
+
+
+-- JOIN Clause Subquery - used to prepare the data (filtering or aggregation) before joining it with other tables
+
+-- show all the customers' details and find the total orders for each customer
+
+--main query 
+select
+    c.*, o.totalorders
+from customers c 
+LEFT JOIN (
+    --subquery
+    select 
+        customerid,
+        count(*)  totalorders
+    from orders
+    group by customerid) o
+on c.customerid = o.customerid;
+
+
+-- WHERE Clause Subquery - used for complex filtering logic and makes the query more flexible and dynamic.
+
+-- Comparison Operators - =,!=,>,<,>=,<=
+
+-- find the products that have a price higher than the average of all products
+
+--main query
+select
+    productid, price
+from products
+where price > ( --subquery
+                select avg(price)
+                from products);
+
+
+-- Logical Operator
+
+-- IN Operator -  checks whether a value matches any value from a list
+
+-- show the details of orders made by customers in 'Germany'
+
+--main query
+select 
+    *
+from orders
+where customerid IN ( --sub query
+                     select customerid
+                     from customers 
+                     where country = 'Germany');
+
+
+-- show the details of orders made by customers NOT in 'Germany'
+
+-- main query
+select 
+    *                         
+from orders
+where customerid NOT IN ( --sub query
+                         select customerid
+                         from customers 
+                         where country = 'Germany');
+
+
+-- Any Operator - checks if a value matches an 'ANY' value within a list
+                -- used to check if a value is true for 'AT LEAST' one of the values in a list.
+
+
+-- find the female employees whose salaries are greater than the salaries of any male employees
+
+select
+    employeeid, firstname, gender, salary
+from employees
+where gender = 'F'
+and salary >ANY(-- sub query
+                select salary from employees where gender= 'M');
+
+-- ALL Operator - checks if a value matches 'ALL' values within a list
+
+-- find the female employees whose salaries are greater than the salaries of all male employees
+
+select
+    employeeid, firstname, gender, salary
+from employees
+where gender = 'F'
+and salary >ALL(-- sub query
+                select salary from employees where gender= 'M');
+
+-- EXISTS Operator - checks if a subquery returns any rows
+
+-- show the details of orders made by customers in 'Germany'
+-- main query
+select
+    *
+from orders o
+where  EXISTS ( -- Subquery
+                      select 1
+                      from customers c 
+                      where country = 'Germany'
+                      and o.customerid = c.customerid );
+
+                      
+ -- show the details of orders made by customers not in 'Germany'
+
+ -- main query
+select
+    *
+from orders o
+where NOT EXISTS ( -- Subquery
+                      select 1
+                      from customers c 
+                      where country = 'Germany'
+                      and o.customerid = c.customerid );
+-- Dependency Subaquereis:
+
+-- Non-Correlated subquery - A subquery that can run independently from the main query
+
+-- Correlated Subquery - A subquery that relies on values from the main query
+
+-- show all customers' details and find the total orders for each customer
+
+select
+    *,
+    (select count(*) from orders o where o.customerid = c.customerid ) totalordersbycustomers
+from customers c ;
+
+-- show the details of orders made by customers in 'Germany'
+-- main query
+select
+    *
+from orders o
+where  EXISTS ( -- Subquery
+                      select 1
+                      from customers c 
+                      where country = 'Germany'
+                      and o.customerid = c.customerid );
+
+---------------------------------------------------------------------------------------------------------------------
+/* CTE - Common Table Expression */
+
+-- CTEs - Temporary named result set(virtual table), that can be used multiple times within your query to simplify and organize complex query
+
+/*  CTE Types:
+
+    1. Non-Recursive CTE - Standalone CTE
+                         - Nested CTE
+    2. Recursive CTE 
+*/
+
+-- 1. Non-Recursive CTE - It is executed only once without any repetition 
+
+-- Standalone CTE - Defined and used independently
+                  -- Runs independently as it's self-contained and doesn't rely on other CTEs or queries
+                  
+-- Multiple Standalone CTE - Combining multiple CTEs into the main query
+
+-- Nested CTE - CTE inside another CTE
+              -- A nested CTE uses the result of another CTE, so it can't run independently.
+
+
+              
+-- step-1: find the total sales per customer (standalone CTE)
+
+with cte_totalsales as (
+    select
+        customerid,
+        sum(sales) totalsales
+    from orders
+    group by customerid
+), 
+-- Step-2: find the last order date for each customer (standalone CTE)
+
+cte_lastorder as(
+    select 
+       customerid,
+       max(orderdate) lastorder
+    from orders
+    group by customerid
+),
+
+-- step-3: Rank customers based on total sales per customer(Nested CTE)
+
+cte_customerrank as (
+    select 
+        customerid,totalsales, 
+        rank() over(order by totalsales DESC) customerrank
+    from cte_totalsales
+    
+),
+-- step-4: Segment customers based on their total sales(Nested CTE)
+
+cte_segment as (
+select 
+    customerid,
+    case 
+        when totalsales > 100 then 'High'
+        when totalsales > 80 then 'Medium'
+        else 'Low'
+    end sales_segement  
+from cte_totalsales
+)
+
+-- main query
+select 
+    c.customerid, 
+    c.firstname,
+    c.lastname,
+    ct.totalsales,
+    cl.lastorder,
+    cr.customerrank,
+    cs.sales_segement
+from customers c
+LEFT join cte_totalsales ct
+on ct.customerid = c.customerid
+left join cte_lastorder cl
+on cl.customerid = c.customerid
+left join cte_customerrank cr
+on cr.customerid = c.customerid
+left join  cte_segment cs
+on cs.customerid = c.customerid;
+
+
+-- 2. Recursive CTE - A Self-Referencing query that repeatedly processes data until a specific condition is met 
+
+-- Generate a sequence of numbers from 1 to 20
+
+with series as(
+    -- anchor query
+    select 1 as seqnumber
+    UNION ALL
+    -- recursive query
+    select 
+        seqnumber+1
+    from series
+    where seqnumber < 20
+    
+)
+
+select * from series;
+
+-- show the employee hierarchy by displaying each employee's level within the organization
+
+with cte_hierarchy as (
+    -- anchor query
+    select 
+        employeeid,firstname,managerid, 1 as level
+    from employees
+    where managerid IS NULL
+    UNION ALL
+    -- recursive query
+    select 
+        e.employeeid,
+        e.firstname,
+        e.managerid,
+        level + 1
+    from employees e
+    inner join cte_hierarchy ch
+    on e.managerid = ch.employeeid
+     
+)
+--main query
+select * from cte_hierarchy;
+------------------------------------------------------------------------------------------
+/*  Views   */
+
+-- view - virtual tables based on the result set of a query, without storing the data in a database.
+        -- Views are persisted SQL queries in the database
+
+-- find the running total of sales for each month
+
+-- solving using CTE
+
+with cte_monthly_summery as (
+    select
+        date_trunc(month,orderdate) ordermonth,
+        sum(sales) totalsales,
+        count(orderid) totalorders,
+        sum(quantity) totalquantities
+    from orders
+    group by ordermonth
+    order by ordermonth
+)
+
+select 
+    ordermonth,
+    totalsales,
+    sum(totalsales) over(order by ordermonth) as runningtotal
+from cte_monthly_summery;
+
+-- Solving suing VIEW
+
+create or replace VIEW sql_learning.learning.V_monthly_summery as
+(
+
+    select
+            date_trunc(month,orderdate) ordermonth,
+            sum(sales) totalsales,
+            count(orderid) totalorders,
+            sum(quantity) totalquantities
+        from orders
+        group by ordermonth
+        order by ordermonth
+);
+
+select 
+    ordermonth,
+    totalsales,
+    sum(totalsales) over(order by ordermonth) as runningtotal
+from v_monthly_summery;
+
+drop view v_monthly_summery;
+
+-- provide a view that combines details from orders, products, customers, and employees
+
+create or replace view v_order_details as
+(
+    select 
+        o.orderid,
+        o.orderdate,
+        p.product,
+        p.category,
+        concat(c.firstname, ' ',coalesce(c.lastname, '')) customername,
+        c.country customercountry,
+        concat(e.firstname, ' ',coalesce(e.lastname, '')) salesname,
+        e.department,
+        o.sales,
+        o.quantity
+    from orders o
+    left join products p
+    on o.productid = p.productid
+    left join customers c
+    on o.customerid = c.customerid
+    left join employees e
+    on o.salespersonid = e.employeeid
+);
+
+select * from v_order_details;
+
+-- provide a view for the EU sales Team that combines all tables and excludes data related to the USA
+create or replace view v_order_details_eu as
+(
+    select 
+        o.orderid,
+        o.orderdate,
+        p.product,
+        p.category,
+        concat(c.firstname, ' ',coalesce(c.lastname, '')) customername,
+        c.country customercountry,
+        concat(e.firstname, ' ',coalesce(e.lastname, '')) salesname,
+        e.department,
+        o.sales,
+        o.quantity
+    from orders o
+    left join products p
+    on o.productid = p.productid
+    left join customers c
+    on o.customerid = c.customerid
+    left join employees e
+    on o.salespersonid = e.employeeid
+    where c.country != 'USA'
+);
+
+select * from v_order_details_eu;
+
+-----------------------------------------------------
+/* CTAS and TMP Tables */
+
+-- Database Table - A table is a structured collection of data, similar to a spreadsheet or grid(Excel)
+
+-- Table Types
+--  1. Permanent Tables - Create/INSERT
+--                      - CTAS
+--  2. Temporary Tables(TMP Tables)
+
+-- Create/Insert:
+-- create - Define the structure of the table
+-- insert - Push the data into the table
+
+-- CTAS - Create Table As Select
+    -- create a new table based on the result of an SQL query 
+
+--Show the total number of orders each month
+
+create or replace table monthlyorders AS (
+    select
+        monthname(orderdate) ordermonth,
+        count(orderid) totalorders
+    from orders
+    group by ordermonth
+);
+
+select * from monthlyorders;
+ 
+drop table monthlyorders;
+
+
+-- TMP Tables - store intermediate results in temporary storage within the database during the session
+              -- The databases will drop the tables once the session ends
+
+create or replace temporary table ttorders as
+(
+    select * from orders
+);
+
+select * from ttorders;
+
+delete from ttorders
+where orderstatus = 'Shipped';
+
+select * from ttorders; --5 rows will be deleted
+
+create or replace table ttorders1 as
+(
+select * from ttorders
+);
+
+select * from ttorders1;
+
+drop table ttorders1;
+
+--------------------------------------------------------------
+
+--SubQU=uery vs CTE vs Views vs CTAS vs TMP
+
+/*
+
+categories   |      SubQuery        |       CTE         |       TMP         |       CTAS        |       VIEW        |
+
+Storage      |  Memory Storage      |    Memory Storage |   Disk Storage    |  Disk Storage     |  Disk Storage     |
+
+When Deleted | End of Query         |    End of Query   |   End of Session  |  until dropped    |  until dropped    |
+
+Life Time    |    Temporary         |    Temporary      |   Temporary       |  Permanent        |  Permanent        |
+
+Scope        |   Single-Query       |    Single-Query   |   Multi-Query     |  Multi-Query      |  Multi-Query      | 
+
+Reusability  |  Limited             |    Limited        |   Medium          |  High             |   High            | 
+
+Up-2-Date    |  Yes                 |    Yes            |   No              |   No              |   Yes             | 
+
+*/
