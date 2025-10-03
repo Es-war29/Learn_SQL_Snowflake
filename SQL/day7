@@ -1,0 +1,177 @@
+/* NULL vs Empty String vs Blank Spaces */
+
+-- NULL - means nothing, unknown
+-- Empty String - String value has zero characters - ''
+-- Blank Space - String value has one or more characters - ' ' or '  '
+
+
+WITH casestudy as (
+select 1 Id, 'A' category UNION
+select 2, NULL UNION
+select 3, '' UNION
+select 4, '  ' 
+)
+
+select 
+    *, length(category) categoryLen 
+from casestudy
+order by Id;
+
+----                        NULL            Empty String            Blank Space
+-- Representation        Null                  ''                      ' '
+-- Data Type             Special Marker     String(0)              String(1 or more)
+-- Meaning               Unknown            known, Empty value     known, Space Value
+-- Storage               Very Minimal       Occupies Memory        Occupies Memory(each space)
+-- Performance           Best               Fast                   Slow
+-- Comparison            IS NULL                =''                      =' '
+
+
+-- Data Policies
+-- 1. Only use NULLs, Empty strings and avoid using Blank Spaces.
+-- 2. Only use Nulls and avoid using empty strings and blank spaces.
+-- 3. Use the default value like 'unknown' and avoid using nulls, empty strings, and blank spaces
+
+
+WITH casestudy as (
+select 1 Id, 'A' category UNION
+select 2, NULL UNION
+select 3, '' UNION
+select 4, '  ' 
+)
+select 
+    *, length(category) categoryLen,
+    length(trim(category)) policy1,
+    NULLIF(trim(category), '') policy2,
+    COALESCE( NULLIF(trim(category), ''),'UNKONWN') policy3
+from casestudy
+order by Id;
+
+
+-- Case Statements --
+--   Evaluates a list of conditions and returns a value when the conditions are met
+
+
+-- Generate a report showing the total sales for each category
+-- High: If the sales are higher than 50
+-- Medium: If the sales are between 20 and 50 
+-- Low: If the sales are equal to or lower than 20
+-- Sort the categories from highest to lowest sales
+
+
+select category,sum(sales) as totalsales
+from(
+    SELECT
+        orderid,
+        sales,
+        case 
+            when sales > 50 then 'High' 
+             when sales >20 then 'Medium' 
+             else 'Low' 
+        END as category
+        FROM ORDERS
+    ) t
+   Group By category
+   order by totalsales desc;
+
+-- Retrieve employee details with gender displayed as full text
+
+SELECT 
+    employeeid,
+    firstname,lastname,
+    gender,
+    case 
+        when GENDER = 'F' then 'Female'
+        when GENDER = 'M' then 'Male'
+        else 'Not Available'
+    END GenderFullText
+FROM employees;
+
+
+-- Retrieve customers' details with abbreviated country code
+
+SELECT 
+    customerid,
+    firstname,lastname,
+    country,
+    Case country
+        when 'Germany' then 'GE'
+        when 'USA' then 'US'
+        when 'UK' then 'UK'
+        else 'N/A'
+    END countryabbreviation
+From customers;
+
+
+-- Find the average score of customers and treat Nulls as 0
+-- Additionally, provide details such as CustomerID and lastname
+
+select
+    customerid,lastname, score,
+    case
+        when score IS NULL then 0
+        else score
+    end cleanscore,
+    avg(score) over() AvgScore,
+    avg(cleanscore) over() AvgCleanScore
+FROM customers;
+
+-- count how many orders each customer had made with sales greater than 30
+
+select 
+    --orderid, sales,
+    customerid,
+    sum(case
+        when sales > 30 then 1
+        else 0
+    end) TotalOrderHighestSales,
+    count(*) totalOrders
+    
+from orders
+--order by customerid
+group by customerid;
+
+
+
+-- SQL BASIC Aggregation Functions --
+
+-- COUNT() - counts the number of rows in the data
+-- SUM() - calculates the sum based on the data
+-- AVG() - calculates the average based on the data
+-- MIN() - gives the minimum value in the data
+-- MAX() - gives the maximum value in the data
+
+-- Find the total number of orders
+
+select count(*) from orders;
+
+-- find the total sales of all orders
+select sum(sales) from orders;
+
+-- find the average sales of all orders
+select avg(sales) from orders;
+
+-- find the highest sales of all orders
+select max(sales) from orders;
+
+-- find the lowest sales of all orders
+select min(sales) from orders;
+
+select 
+    customerid,
+    count(*) as ordercount,
+    sum(sales) totalsales,
+    avg(sales) averagesales,
+    max(sales) highestsale,
+    min(sales) lowestsale
+from orders
+group by customerid;
+
+-- Analyse the score in the customer table
+
+Select 
+    sum(score) totalscore,
+    avg(coalesce(score,0)) avgscore,
+    min(coalesce(score,0)) lowestscore,
+    max(score) highestscore,
+    count(*) numberofcustomers
+FROM customers;
