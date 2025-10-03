@@ -1,0 +1,152 @@
+/*     SQL JOINS      */
+
+-- Basic JOINS
+
+--NO Join - Returns data from tables without combining them
+
+-- Retrieve all data from customers and orders as separate results
+select * from customers;
+
+select * from orders;
+
+--INNER Join - Returns only matching rows from both tables
+
+-- Get all customers along with their orders, but only for customers who have placed an order
+
+select c.customerid,c.firstname,o.orderid,o.sales
+from customers c
+INNER join orders o
+on c.customerid = o.customerid
+order by c.customerid;
+
+-- LEFT JOIN - Returns all rows from the left table and only matching rows from the right table
+
+-- Get all customers along with their orders, including those without orders
+
+select c.customerid,c.firstname,o.orderid,o.sales
+from customers c
+LEFT join orders o
+on c.customerid = o.customerid
+order by c.customerid;
+
+/*
+select *
+from customers c
+LEFT join orders o
+on c.customerid = o.customerid
+order by c.customerid; 
+*/
+
+-- RIGHT JOIN -Returns all rows from Rthe ight table and only matching rows from the Left Table
+
+-- Get all customers along with their orders, including orders without matching customers
+
+select c.customerid,c.firstname,o.orderid,o.sales
+from customers c
+RIGHT join orders o
+on c.customerid = o.customerid
+order by c.customerid;
+
+
+/*
+select *
+from customers c
+RIGHT join orders o
+on c.customerid = o.customerid
+order by c.customerid; 
+*/
+
+select c.customerid,c.firstname,o.orderid,o.sales
+from orders o
+LEFT join  customers c
+on c.customerid = o.customerid
+order by c.customerid;
+
+
+-- FULL JOIN - Returns all rows from both tables
+
+-- Get all customers and all orders, even if there's no match
+
+select c.customerid,c.firstname,o.orderid,o.sales
+from customers c
+FULL join orders o
+on c.customerid = o.customerid
+order by c.customerid;
+
+/*
+select *
+from customers c
+FULL join orders o
+on c.customerid = o.customerid
+order by c.customerid; 
+*/
+
+-- Advanced JOINS
+
+-- LEFT ANTI JOIN - Returns row from Left table that has no match in Right
+
+-- Get customers who haven't placed any orders 
+
+select * from customers c 
+LEFT JOIN orders o 
+on c.customerid = o.customerid  
+where o.customerid IS NULL;
+
+
+-- RIGHT ANTI JOIN - Returns row from the Right table that has no match in the Left Table
+
+-- get all orders without matching customers
+
+select * from customers c
+RIGHT JOIN orders o 
+on c.customerid =  o.customerid 
+where  o.customerid IS NULL;
+
+select * from orders o 
+LEFT JOIN customers c
+on c.customerid =  o.customerid 
+where c.customerid IS NULL ;
+
+
+-- FULL ANTI JOIN - Returns only rows that don't match in either tables
+
+-- Find customers without orders and orders without customers
+
+select * from customers c
+FULL JOIN orders o
+on c.customerid = o.customerid
+where c.customerid IS NULL or o.customerid IS NULL;
+
+
+-- GET all customers along with their oders, but only for customers who have placed an order with out using inner join.
+
+
+select * from customers c
+LEFT join orders o
+on c.customerid = o.customerid
+where o.customerid IS NOT NULL;
+
+
+-- CROSS JOIN - Combines every row from left with every row from right.
+--  All possible combinations - Cartesian Products
+
+-- Generate all possible combinations of customers and orders
+
+select * from customers c
+Cross JOIN orders o
+order by c.customerid;
+
+
+-- TASK: Using salesDB, retrieve a list of all orders, along with related customer, product, and employee details. 
+For each order display:orderid, customer's name, product name, sales, price, sales person's name
+
+select 
+    o.orderid,
+    concat(c.firstname, ' ', c.lastname) as customer_name,
+    p.product, p.price,
+    o.sales,
+    concat(e.firstname, ' ', e.lastname) as sales_person_name
+from orders o
+LEFT JOIN  customers c on o.customerid = c.customerid
+LEFT JOIN products p on o.productid = p.productid
+LEFT JOIN employees e on o.salespersonid = e.employeeid;
