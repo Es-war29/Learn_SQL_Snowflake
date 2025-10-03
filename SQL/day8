@@ -1,0 +1,392 @@
+
+/* Basic Window Functions */
+
+-- Find the total sales across all orders
+
+SELECT
+    sum(sales) totalsales
+FROM orders;
+
+-- find the total sales for each product
+SELECT 
+    productid, sum(sales) salesproductwise
+From orders
+group by productid
+order by productid;
+
+-- Find the total sales for each product, and additionally provide details such as orderid & order date
+SELECT 
+    orderid, orderdate, productid, sum(sales) over(partition by productid) TotalSalesByProduct
+FROM orders
+order by productid;
+
+-- find the total sales across all orders and additionally provide details such as orderid & order date
+
+SELECT 
+     orderid, orderdate,productid, sum(sales) over() TotalSales
+FROM orders;
+
+-- Find the total sales for each product, find the total sales across all orders and additionally provide details such as orderid & order date
+SELECT 
+    orderid, orderdate, productid, sales,
+    sum(sales) over() TotalSales,
+    sum(sales) over(partition by productid) TotalSalesByProduct
+FROM orders
+order by productid;
+
+
+-- find the total sales for each combination of product and order status
+SELECT 
+    orderid, orderdate, productid, sales,orderstatus,
+    sum(sales) over() TotalSales,
+    sum(sales) over(partition by productid) SalesByProduct,
+    sum(sales) over(partition by productid, orderstatus) SalesByProductStatus
+FROM orders
+order by productid;
+
+
+-- Rank  each order based on its sales, highest to lowest, and additionally provide order ID and order date
+
+SELECT
+    orderid,orderdate, sales,
+    Rank() over(order by sales DESC) ranksales
+FROM orders;
+
+
+SELECT
+    orderid,orderdate,orderstatus, sales,
+    sum(sales) over(partition by orderstatus ORDER BY orderdate DESC
+    ROWS BETWEEN 2 preceding and  CURRENT ROW) TotalSales
+FROM orders;
+
+-- rank the customers based on their total sales
+
+SELECT 
+    customerid,
+    sum(sales) totalsales,
+    rank() over(order by totalsales DESC) rankcustomers
+FROM orders
+group by customerid;
+
+/*  WINDOW AGGREGATION FUNCTIONS */
+
+-- find the total number of orders 
+-- find the total number of orders for each customer
+-- additionally, provide the details of the order ID and the order date
+
+SELECT 
+    orderid, orderdate,customerid,
+    count(*)  over() totalorders,
+    count(*) over(PARTITION by customerid ) customerorders
+FROM orders
+order by customerid;
+
+-- find the total number of customers along with all the details
+-- find the total number of scores for the customers 
+
+SELECT 
+    *,count(*) over() totalcustomers,
+    count(1) over() numofcustomers,
+    count(score) over() customersscore,
+    count(country) over() customerscountry
+FROM customers;
+
+ -- check whether the table 'orders' contains duplicates
+select * from (
+     SELECT
+        orderid,
+        count(*) over(partition by orderid) checkPK
+     FROM orders
+ ) t
+ where checkPK >1;
+
+
+ -- Find the total sales across all orders and the total sales for each product.
+ -- additionally provide details such as order id, order date
+
+ SELECT
+    orderid,orderdate, sales, productid,
+    sum(sales) over() totalsales,
+    sum(sales) over(partition by productid) salesbyproducts
+ FROM orders
+ order by productid;
+
+ -- find the percentage contribution of each product sale to the total sales
+SELECT
+    orderid, productid, sales,
+    sum(sales) over() totalsales,
+    round(sales / sum(sales) over() *100,2) percentage
+FROM orders;
+
+
+-- find the average sales across all orders and the average sales of each product
+-- additionally provide details of order id and orderdate
+
+SELECT
+    orderid, orderdate, productid, sales,
+    avg(sales) over() averagesales,
+    avg(sales) over(partition by productid) salesbyproduct
+FROM orders
+order by productid;
+
+-- find the average scores of customers 
+-- additionally provide details of customer id, last name
+
+SELECT
+    customerid,lastname,score,
+    coalesce(score,0) scorewithoutnull,
+    avg(score) over() averagescorewithnull,
+    avg(coalesce(score,0)) over() averagescorewithnull
+FROM customers;
+
+-- find all orders where sales are higher than average sales across all orders
+select * from (
+    SELECT
+        orderid, productid, sales,
+        avg(sales) over() avgsales
+    FROM orders
+) t
+where sales >avgsales; 
+
+
+-- find the highest & lowest sales across all orders and highest & lowest sales for each product
+-- additionally provide details such as orderid,orderdate
+
+select 
+    orderid,orderdate, productid, sales,
+    MAX(sales) over() highestsale,
+    max(sales) over(partition by productid) highestsalebyproduct,
+    MIN(sales) over() lowestsale,
+    min(sales) over(partition by productid) lowestsalebyproduct
+from orders
+order by productid;
+
+
+-- show the employees who have the highest salaries
+SELECT * from (
+    SELECT
+        *,max(salary) over() highestsalary
+    FROM employees
+    ) t 
+where salary = highestsalary;
+
+-- calculate the deviation of each sale from both the minimum and maximum sales amount
+
+select 
+    orderid,orderdate, productid, sales,
+    min(sales) over() lowestsale,
+    max(sales) over() highestsale,
+    sales - min(sales) over() deviationfromminsale,
+    max(sales) over() - sales deviationfrommaxsale
+from orders
+order by productid;
+
+-- calculate the moving average of sales for each product  over time
+
+SELECT
+    orderid,orderdate, productid, sales,
+    avg(sales) over(partition by productid) avgbyproduct,
+     avg(sales) over(partition by productid order by orderdate) movingavg
+FROM orders
+order by productid;
+
+-- calculate the moving average of sales for each product  over time, including only the next order
+SELECT
+    orderid,orderdate, productid, sales,
+    avg(sales) over(partition by productid) avgbyproduct,
+    avg(sales) over(partition by productid order by orderdate) movingavg,
+    avg(sales) over(partition by productid order by orderdate rows between current row and 1 following) rollingavg
+FROM orders
+order by productid,orderdate;
+
+
+/* WINDOW RAKING FUNCTIONS */
+
+-- Integer-based Ranking --
+
+--ROW_NUMBER() - Assign a unique number to each row
+                -- It doesn't handle ties 
+                
+-- rank the orders based on their sales from highest to lowest
+
+SELECT 
+    orderid,orderdate, productid, sales,
+    row_number() over(order by sales desc) salesrownum
+FROM orders;
+
+-- RANK() - Assign a rank to each row. It handles ties.
+          -- It leaves a gap in the ranking
+
+-- -- rank the orders based on their sales from highest to lowest
+
+SELECT 
+    orderid,orderdate, productid, sales,
+    rank() over(order by sales desc) salesrank
+FROM orders;
+
+-- DENSE_RANK() - Assign a rank to each row. It handles ties.
+                -- It doesn't leave the gaps in the ranking
+
+-- -- - rank the orders based on their sales from highest to lowest
+
+SELECT 
+    orderid,orderdate, productid, sales,
+    dense_rank() over(order by sales desc) salesdenserank
+FROM orders;
+-- Use cases --
+-- Top N-Analysis
+-- find the top highest sales for each product
+
+select * from (
+    SELECT
+        orderid, productid, sales,
+        row_number() over(partition by productid order by sales desc) rankbyproduct
+    FROM orders
+) t where rankbyproduct = 1;
+
+-- Bottom N-Analysis
+-- Find the lowest 2 customers based on their sales
+
+select * from (
+    SELECT 
+        customerid,
+        sum(sales) totalsales,
+        row_number() over(order by totalsales) rankcustomers
+    FROM orders
+    group by customerid
+) t where rankcustomers <= 2;
+
+-- Generate Unique IDs
+-- Assign unique IDs to rows of the 'orders archive' table
+
+select
+    row_number() over(order by orderid,orderdate) uniqueid,
+    *
+from ordersarchive;
+
+-- Identify Duplicates
+
+-- Identify duplicate rows in the table 'Order Archive' and return clean results without any duplicates
+
+select * from (
+    SELECT 
+        row_number() over(partition by orderid order by creationtime desc) rn,
+        *
+    FROM ordersarchive
+) t where rn = 1;
+
+-- NTILE() - Divides the rows into a specified number of approximately equal groups(buckets)
+
+select
+ orderid, sales,
+ NTILE(1) over(order by sales DESC) onebucket,
+ NTILE(2) over(order by sales DESC) twobucket,
+ NTILE(3) over(order by sales DESC) threebucket,
+ NTILE(4) over(order by sales DESC) fourbucket
+from orders;
+
+-- Use Case
+-- Data Segmentation - Divides a dataset into distinct subsets based on certain criteria
+
+-- Segment all orders into 3 categories: high, medium, low sales
+
+select *,
+    case buckets
+        when 1 then 'High'
+        when 2 then 'Medium'
+        when 3 then 'Low'
+    END SalesSegmentation
+from (
+    select 
+        orderid, sales,
+        NTILE(3) over(order by sales desc) buckets
+    from orders
+) t ;
+
+-- Equalizing load 
+-- In-order to export the data, divide the orders into 2 groups
+
+select
+     NTILE(4) over(order by orderid) buckets,
+     *
+from orders;
+
+-- Percenatge -based Ranking --
+
+-- CUME_DIST()
+-- PERCENT_RANK() - calculates the relative position of each row
+
+-- find the product that falls within the highest 40% of prices
+select *,
+    concat(distrank * 100, '%') distrankperc,
+    concat(distrank1 * 100, '%') distrank1perc
+from (
+    select
+        productid, product, price,
+        cume_dist() over(order by price desc) distrank,
+        percent_rank() over(order by price desc) distrank1
+    from products
+) t where distrank <= 0.4;
+
+/* Window Analytical Functions */
+-- Value window Functions --
+
+-- LEAD() - Access a value from the next row within a window
+-- LAG() - Access a value from the previous row within a window
+
+-- Analyze the month-over-month(MoM) performance by finding the percentage change in sales between the current and previous month
+select *, currentsalesbymonth - previousmonthsales MoM,
+    round(MoM/ previousmonthsales* 100,1) MoM_Percentage  
+from (
+    SELECT 
+        --orderid,orderdate, sales,
+        MONTH(orderdate) ordermonth,
+        sum(sales) currentsalesbymonth,
+        lag(currentsalesbymonth) over(order by ordermonth) previousmonthsales
+    FROM orders
+    group by ordermonth
+) t;
+
+
+-- Analyze customer loyalty by ranking customers based on the average number of days between orders
+
+select customerid,
+    round(avg(daysuntilnextorder),1) daysavg,
+    rank() over(order by daysavg) rankavg
+from (
+    SELECT
+        orderid,customerid,orderdate as currentorder,
+        LEAD(orderdate) over(partition by customerid order by orderdate) nextorder,
+        DATEDIFF(day,currentorder,nextorder) daysuntilnextorder
+    FROM orders
+    --order by customerid,orderdate
+) t 
+group by customerid;
+
+-- FIRST_VALUE() - access a value from the first row within a window
+-- LAST_VALUE() - access a value from the last row within a window
+
+-- find the lowest and highest sales for each product
+
+
+SELECT
+    orderid, productid, sales,
+    first_value(sales) over(partition by productid order by sales) lowest_sales,
+    last_value(sales) over (partition by productid order by sales
+    rows between current row and unbounded following) highest_sales,
+    first_value(sales) over(partition by productid order by sales DESC) highest_sales2,
+    MIN(sales) over(partition by productid ) lowest_sales2,
+    MAX(sales) over(partition by productid ) highest_sales3
+FROM orders
+order by productid;
+
+
+-- find the difference between the current sales and the lowest sales
+SELECT
+    orderid, productid, sales,
+    first_value(sales) over(partition by productid order by sales) lowest_sales,
+    last_value(sales) over (partition by productid order by sales
+    rows between current row and unbounded following) highest_sales,
+    sales - lowest_sales lowsalesdifference
+FROM orders
+order by productid, sales;
