@@ -1,0 +1,347 @@
+/* SQL FUNCTIONS */
+
+-- Single-Row Functions - Row Level Calculations
+/* 
+    String Functions
+    Numeric Functions
+    Date & Time Functions
+    Null Functions
+    
+*/
+-- Multi-Row Functions - Aggregations
+/*
+    Aggregate Functions
+    Window Functions
+*/
+
+
+--      String Functions     --
+
+/* 
+    Manipulation -- CONCAT, UPPER, LOWER, TRIM, REPLACE
+    Calculation -- LEN
+    String Extraction -- LEFT, RIGHT, SUBSTRING
+*/
+
+-- Manipulation String Function --
+
+-- CONCAT() - combine multiple string values
+
+-- Concatenate the customer's first names with their country in one column
+
+SELECT 
+    customerid, firstname, country,
+    concat(firstname,'-', country) as combine_name
+    FROM CUSTOMERS;
+
+-- UPPER() - convert all characters to uppercase
+-- LOWER() - converts all characters to lowercase
+
+SELECT
+        customerid,
+        LOWER(firstname) name,
+        UPPER(country) COUNTRY
+    from customers;
+
+-- TRIM() - Removes the leading and trailing spaces 
+
+-- Find Customers whose first name contains leading or trailing spaces
+
+Update customers
+set firstname = ' Kevin'
+where customerid = 2;
+
+SELECT
+     customerid, firstname, LENGTH(firstname) len,
+     length(TRIM(firstname)) trim_len,
+     LENGTH(firstname) - LENGTH(TRIM(firstname)) flag
+    FROM CUSTOMERS
+    where  LENGTH(firstname) != LENGTH(TRIM(firstname));
+    --where firstname != TRIM(firstname);
+
+-- REPLACE() - replaces specific character with a new character
+
+-- Replace dashes (-) in the phone number
+
+SELECT '123-456-789' phone_num,
+        replace('123-4567-789','-','/') replaced_phone_num;
+
+-- Replace file extensions from txt to csv
+
+SELECT 'report.txt' old_file,
+        replace('report.txt','.txt','.csv') new_file;
+
+--  String Calculation Functions --
+-- LENGTH() - counts how many characters 
+
+-- Calculate the length of each customer's firstname
+
+SELECT firstname,LENGTH(firstname) name_len
+    from customers;
+
+
+-- String Extraction Functions --
+-- LEFT() - Extracts a specific number of characters from the start
+-- RIGHT() - Extracts a specific number of characters from the end
+
+-- Retrieve the first two characters of each customer's first name and the last 2 characters of the first name
+
+SELECT 
+        firstname,
+        LEFT(TRIM(firstname),2) first_2_characters,
+        RIGHT(firstname,2) last_2_characters
+    FROM customers;
+
+-- SUBSTR() - Extracts a part of a string at a specific position
+
+-- Retrieve a list of customers' first names after removing the first character
+
+SELECT 
+    firstname,
+    substr(TRIM(firstname),2,LENGTH(firstname)) sub_name
+FROM customers;
+
+
+--     Numeric Functions --
+
+-- ROUND() - Rounds to the given decimal point
+-- ceil() - rounds to the next integer  value
+-- floor - rounds to the previous integer value
+-- ABS() - converts a negative value to a positive value
+
+SELECT 3.14159,
+    ROUND(3.14159,2) round_2,
+    round(3.14159,1) round_1,
+    round(3.14159,0) round_0,
+    ceil(3.14159) ceiling,
+    floor(3.14159) flooring,
+    ABS(3.14), ABS(-3.14);
+
+
+--     Date & Time Functions --
+
+select 
+    orderid,
+    orderdate,
+    shipdate,
+    creationtime
+    from orders;
+
+/*
+ Part Extraction -- DAY, MONTH, YEAR, DATE_PART, DATENAME, DATE_TRUNC, EOMONTH
+ Format & Casting -- FORMAT, CONVERT, CAST
+ Calculations -- DATEADD, DATEDIFF
+ Validation -- IS_DATE
+*/
+
+-- Part Extraction Function --
+
+-- Day() - returns the day from the date
+-- Month() - returns the month from the date
+-- Year() - returns the year from the date
+-- CURRENT_DATE - returns today's date
+-- currCURRENT_TIMESTAMP - returns today's date with the current time, including seconds and time zone
+-- DADATE_PART() - returns a specific part of the date as a number
+-- DATENAME() - returns the name of a specific date (in SQL)
+-- to_date() - returns the date in the data.
+-- dayname - returns the day name like sun, mon 
+-- DATE_TRUNC() - truncates the date to a specific part  or resets to the specific part 
+-- last_day() - returns the last day of the month { EOMONTH() in SQL}
+
+
+
+SELECT current_date,
+       current_timestamp,
+       CREATIONTIME,
+       Day(CREATIONTIME) day,
+       month(CREATIONTIME) month,
+       year(creationtime) year,
+       DATE_PART(hour,creationtime) hour,
+       DATE_PART(week,creationtime) week,
+       to_date(creationtime),
+       dayname(creationtime),
+       monthname(creationtime),
+       date_trunc(minute,creationtime) minute_dt,
+       date_trunc(day,creationtime) day_dt,
+       date_trunc(month,creationtime) month_dt,
+       last_day(creationtime) last_day_of_month,
+      
+       FROM ORDERS;
+
+       
+
+-- How many orders are placed each year?
+
+select 
+    year(orderdate),
+    count(*) num_orders
+from orders
+group by year(orderdate);
+
+-- How many orders are placed each month?
+
+select 
+    month(orderdate),
+    count(*) num_orders
+from orders
+group by month(orderdate);
+
+select monthname(orderdate),
+    count(*) num_orders
+from orders
+group by monthname(orderdate);
+
+-- Show all the orders that are placed during the month of feb?
+
+select * from orders
+where month(orderdate) = 2;
+
+--  Format & Casting Functions --
+
+-- format() - formats a date or time value (in sql)
+-- convert() - converts a date or time value to a different data type & formats the value (in sql)
+-- cast() - converts a value to a specific data type
+
+select try_cast('123' as INT),
+try_cast('2025-05-01' as DATE);
+
+-- Date & Time Calculation Functions --
+
+-- DATEADD() - adds or subtracts a specific time interval to/from the date
+-- DDATEDIFF() - difference between two dates
+
+select 
+    orderid,
+    orderdate,
+    dateadd(day,2,orderdate) daysadded,
+    dateadd(year,-2,orderdate) yearslessed,
+from orders;
+
+-- calculate the age of employees
+
+select 
+        EMPLOYEEID,
+        birthdate,
+        datediff(year,birthdate,current_date) age
+from employees;
+
+-- Find the average shipping duration in days for each month
+
+select 
+    month(orderdate),
+    round(avg(datediff(day,orderdate,shipdate)),0) avg_shipping_days
+from orders
+group by month(orderdate);
+
+
+-- Time Gap Analysis
+-- Find the number of days between each order and the previous order
+
+
+select orderid,
+    orderdate latest_order,
+    LAG(orderdate) over( ORDER BY orderdate) previous_order,
+    datediff(day,previous_order,latest_order) days_gap
+from orders;
+
+
+-- DATE & TIME Validation Function --
+
+-- IS_DATE() - Check if a value is a date
+            -- Returns '1' if the string value is a valid date. (in sql)
+            
+-- try_to_date() - check if a value is a date, returns true if correct
+
+
+select 
+    try_to_date('2025-06-28', 'YYYY-MM-DD') is not null as is_valid_date,
+    try_to_date('1', 'YYYY-MM-DD') is not null as is_valid_date1;
+
+
+
+-- NULL Functions --
+
+-- ISNULL() - replaces null with a specific value
+-- COALESCE() - returns the non-null value from a list
+
+-- find the average scores for the customers
+update customers
+set score = NULL 
+where customerid = 5;
+
+SELECT 
+    customerid, score,coalesce(score,0) score2,
+    avg(score) over() avgscores,
+    avg(coalesce(score,0)) over() avgscores2
+FROM customers;
+
+-- Display the full name of customers and add 10 points to each customer's score
+
+SELECT 
+    customerid,
+    firstname,lastname,
+    concat(firstname, ' ',coalesce(lastname,'')) full_name,
+    score,
+    coalesce(score,0)+10 score_bounce
+    FROM customers;
+
+
+-- sort the customers from lowest to highest scores, with NULL values appearing at the last
+
+SELECT
+    customerid,
+    score,
+    --coalesce(score,999999)
+    --case when score IS NULL THEN 1 ELSE 0 END flag
+    FROM customers
+    --order by coalesce(score,999999);
+    order by case when score IS NULL THEN 1 ELSE 0 END, score;
+
+
+-- NULLIF() - compares two expressions and returns
+            -- NULL if they are equal
+            -- first value if they are not equal
+
+-- Find the sales price for each order by dividing the sales by quantity
+
+select
+    orderid, sales, quantity,
+    round(sales/NULLIF(quantity,0),0) price
+from orders;
+
+
+-- IS NULL () - Returns True if the value is NULL, otherwise it will return False.
+-- IS NOT NULL () - Returns True if the value is NOT NULL, otherwise it will return False.
+
+-- For the price is null, flag it as true, and for price is not null, flag it as true
+
+select
+    orderid, sales, quantity,
+    round(sales/NULLIF(quantity,0),0) price,
+    price is null Flag,
+    price is not null flag2
+from orders;
+
+-- Identify the customers who have no scores
+
+SELECT
+    customerid, firstname, score,
+    score is null flag
+FROM CUSTOMERS
+where flag = True;
+-- where score is null;
+
+-- list customers who have scores
+SELECT
+    *
+FROM customers
+WHERE score is not null;
+
+
+-- List all details of customers who have not placed any orders
+
+SELECT
+    c.*,o.orderid
+FROM customers c
+LEFT JOIN ORDERS o ON c.customerid = o.customerid
+where o.customerid IS NULL;
