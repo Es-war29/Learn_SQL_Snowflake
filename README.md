@@ -51,3 +51,4 @@ This repo is for SQL learning <br>
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
 This Repo is for my daily learning of SQL.
+Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/eswar-pillalamarri/) or check out my other projects on [GitHub](https://github.com/Es-war29).
