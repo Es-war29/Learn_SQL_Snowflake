@@ -1,0 +1,100 @@
+/*       SET Operators          */
+
+/*
+    Rules of SET Operators
+    Rule 1: Order By can be used only once
+    Rule 2: Same number of columns
+    Rule 3: Matching Data Types
+    Rule 4: Same Order of Columns
+    Rule 5: First Query Controls Alias
+    Rule 6: Mapping Correct Columns
+    
+*/
+
+-- UNION 
+    -- Returns all distinct rows from both queries
+    -- Remove duplicate rows from the results.
+
+
+-- Combine the data from employees and customers into one table
+
+select firstname,lastname from employees; --5 results
+
+select firstname,lastname from customers; -- 5 results
+
+select firstname,lastname from employees
+UNION
+select firstname,lastname from customers;
+ --Kevin and Mary are there in both tables, so using union only 1 time they appear
+
+-- UNION ALL - Returns all rows from both queries, including duplicates.
+
+-- Combine the data from employees and customers into one table, including duplicates 
+ 
+select firstname,lastname from employees
+UNION ALL
+select firstname,lastname from customers;
+
+
+-- EXCEPT 
+    --Returns all distinct rows from the first query that are not found in the second query
+    -- It is the only one where the order of queries affects the final result.
+
+
+-- find the employees who are not customers at the same time
+
+select  firstname, lastname from employees
+EXCEPT
+select firstname,lastname from customers;
+-- result w.r.t to employees table Carol, Michael, Frank
+    
+select  firstname, lastname from customers 
+EXCEPT
+select firstname,lastname from employees;
+-- result w.r.t to employees table Mark, Anna, Jossef
+
+
+-- INTERSECT - Returns only the rows that are common in both queries
+
+-- Find the employees who are also customers
+
+select  firstname, lastname from employees
+INTERSECT
+select firstname,lastname from customers;
+
+
+--TASK: 
+-- Orders data are stored in separate tables (orders and orderArchive)
+-- Combine all orders data into one report without duplicates.
+
+select 
+    'Orders' as SourceTable,
+    ORDERID,
+	PRODUCTID,
+	CUSTOMERID,
+	SALESPERSONID,
+	ORDERDATE,
+	SHIPDATE,
+	ORDERSTATUS,
+	SHIPADDRESS,
+	BILLADDRESS,
+	QUANTITY,
+	SALES,
+	CREATIONTIME 
+from orders
+UNION
+select 
+    'OrdersArchive' as SourceTable,
+    ORDERID,
+	PRODUCTID,
+	CUSTOMERID,
+	SALESPERSONID,
+	ORDERDATE,
+	SHIPDATE,
+	ORDERSTATUS,
+	SHIPADDRESS,
+	BILLADDRESS,
+	QUANTITY,
+	SALES,
+	CREATIONTIME
+from ordersarchive;
