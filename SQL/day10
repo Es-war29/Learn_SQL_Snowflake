@@ -1,0 +1,177 @@
+/* Stored Procedure & Triggers(task and stream) */
+
+-- Stored Procedure: It is a prepared set of SQL code that can be reused over and over again
+
+-- step:1
+-- write a query for the us customers 
+-- find the total number of customers and the average score
+
+select 
+    count(*) total_customer,
+    avg(score) avg_score
+from customers
+where country = 'USA';
+
+--step:2
+-- turn the above query into a stored procedure
+
+CREATE OR REPLACE PROCEDURE us_customers()
+RETURNS TABLE (total_customer NUMBER, avg_score FLOAT)
+LANGUAGE SQL
+AS
+$$
+DECLARE
+    res RESULTSET DEFAULT (
+        SELECT 
+            COUNT(*)::NUMBER AS total_customer,
+            AVG(score)::FLOAT AS avg_score
+        FROM customers
+        WHERE country = 'USA'
+    );
+BEGIN
+    RETURN TABLE(res);
+END;
+$$;
+
+--step:3 
+-- Execute the procedure
+
+call us_customers();
+
+SELECT * FROM TABLE(us_customers());
+
+
+-- Create a stored procedure for any country given by the user,
+-- find the total number of customers and the average score
+
+CREATE OR REPLACE PROCEDURE customers_summary(country STRING)
+RETURNS TABLE (total_customer NUMBER, avg_score FLOAT)
+LANGUAGE SQL
+AS
+$$
+DECLARE
+    res RESULTSET DEFAULT (
+        SELECT 
+            COUNT(*)::NUMBER AS total_customer,
+            AVG(score)::FLOAT AS avg_score
+        FROM customers
+        WHERE country = :country
+    );
+BEGIN
+    RETURN TABLE(res);
+END;
+$$;
+
+CALL customers_summary('UK');
+CALL customers_summary('Germany');
+CALL customers_summary('USA');
+
+
+
+-- NVL & IFF
+--NVL is used to replace a NULL value with a default value, like the ifnull() function
+-- IFF is Snowflake’s inline if-else function.
+        --  It’s like a ternary operator: choose between two values based on a condition.
+
+CREATE OR REPLACE PROCEDURE customers_summary1(country STRING)
+RETURNS TABLE (total_customer NUMBER, avg_score FLOAT,total_orders NUMBER,total_sales NUMBER)
+LANGUAGE SQL
+AS
+$$
+DECLARE
+    input_country STRING DEFAULT NVL(country,'USA');
+    res RESULTSET;
+    
+BEGIN
+    -- Assigning the default value of USA if no value was given
+    
+    input_country := IFF(UPPER(TRIM(input_country)) = 'NULL', 'USA', input_country);
+    
+    -- find the total number of orders and total sales, total customers, and average score for the user's given country
+    res:= (
+            SELECT 
+                COUNT(c.customerid)::NUMBER AS total_customer,
+                AVG(NVL(c.score,0))::FLOAT AS avg_score,
+                count(o.orderid) total_orders,
+                sum(ifnull(o.sales,0)) total_sales
+            from orders o
+            left join customers c
+            on c.customerid = o.customerid
+            WHERE upper(trim(country)) =upper(trim(:input_country)) 
+            group by upper(trim(:input_country))
+    );
+              
+    RETURN TABLE(res);
+    
+END;
+$$;
+
+CALL customers_summary1(null); --usa data
+CALL customers_summary1('NULL'); --usa data
+CALL customers_summary1('UK'); --uk data
+CALL customers_summary1('Germany'); --germany data
+-------------------------------------------------------------------------------------------------
+
+-- Triggers - Special stored procedure that automatically runs in response 
+            -- to a specific event on a table or a view.
+
+-- Types -- DDL Triggers - create, alter, drop
+         -- Logon Triggers
+         -- DML Triggers - Insert, update, delete - After, Instead of
+
+CREATE OR REPLACE SEQUENCE log_seq START = 1 INCREMENT = 1;
+
+create or replace table log_table(
+    logid INT primary key,
+    employeeid INT,
+    logmessage varchar(100),
+    logdate Timestamp
+);
+
+CREATE OR REPLACE STREAM employees_stream
+ON TABLE employees
+APPEND_ONLY = TRUE;  -- Tracks only new inserts
+
+
+CREATE OR REPLACE PROCEDURE log_new_employee()
+RETURNS STRING
+LANGUAGE SQL
+AS
+$$
+BEGIN
+    INSERT INTO log_table (logid,employeeid,logmessage,logdate)
+    select  
+        log_seq.NEXTVAL, 
+        employeeid,
+        'A new employee was added',
+        current_timestamp() 
+        from employees_stream;  
+
+    
+    RETURN 'Log inserted successfully';
+END;
+$$;
+
+call log_new_employee();
+
+CREATE OR REPLACE TASK employees_log_task
+WAREHOUSE = 'compute_wh'
+SCHEDULE = 'USING CRON * * * * * UTC'  -- runs every minute
+AS
+CALL log_new_employee();
+---------
+insert into employees
+values (6,'Eswar','Pillalamarri','Infra','1999-09-29','M',60000,3);
+ALTER TASK employees_log_task resume;
+
+SHOW TASKS LIKE 'employees_log_task'; -- to check the task status
+
+SELECT * from employees;  -- to check the inserted data in table
+
+select * from employees_stream; -- to check the newly added data in stream
+
+select * from log_table; -- the final log output
+
+--truncate log_table;
+
+
