@@ -59,6 +59,7 @@ This repo is for SQL and Snowflake learning <br>
 - What is Snowflake
 - Snowflake Architecture
 - Creating DB, Schema, Table, and inserting data into the table.
+- Learn a bit more about [Snowflake_Architecture](https://docs.snowflake.com/en/user-guide/intro-key-concepts).
   
 ---
 # About Me
