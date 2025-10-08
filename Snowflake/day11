@@ -1,0 +1,82 @@
+/*
+🧠 What is Snowflake?
+
+Snowflake is a cloud-based data warehouse built to store, process, and analyze massive amounts of data.
+
+Unlike traditional warehouses, Snowflake is:
+
+     - Fully managed (no servers or infrastructure)
+
+     - Separation of storage & compute (you pay separately for each)
+
+     - Multi-cloud (works on AWS, Azure, or GCP)
+
+     - Scalable & elastic (auto-scale up/down)
+
+     - Supports structured + semi-structured data (JSON, Avro, Parquet)
+
+🔹 Example Analogy
+
+Think of Snowflake as:
+
+    Storage: like Google Drive (stores all your files = data)
+
+    Compute: like your laptop (does the processing = queries)
+
+    Cloud Services: like your operating system (manages access, security, metadata, etc.)
+
+
+🧩 Snowflake Architecture
+
+Snowflake has three layers:
+
+Layer	              | Description	                                      | Examples
+Storage Layer	      | Where data is stored (compressed, columnar)       |	Tables, micro-partitions
+Compute Layer	      | Virtual Warehouses that process queries	          | COMPUTE_WH
+Cloud Services Layer  | Manages authentication, metadata, optimization	  | Query parsing, access control
+
+*/
+
+-- 🧱  Create Your First Database & Schema
+
+-- creating a database
+    Create or replace database snow_DB;
+    
+-- connect to the database
+    use database snow_db;
+    
+-- lists all the databases
+    show databases;
+    
+-- create a schema and use the  schema
+    create or replace schema public;
+    use schema public;
+    
+-- Lists the schemas in the database
+    show schemas;
+
+-- A database in Snowflake is a logical grouping of schemas, 
+-- and a schema contains tables, views, and other objects — just like in traditional RDBMS.
+
+-- 🧱 Create and Query Your First Table
+
+create or replace table employees(
+    emp_id INT,
+    emp_name varchar(50),
+    dept varchar(25),
+    salary INT
+);
+
+insert into employees ( emp_id,emp_name,dept,salary)
+   values
+    (1, 'Eswar', 'IT',60000),
+    (2, 'Naveen', 'Sales', 55000),
+    (3, 'Kumar', 'Finance', 70000);
+
+select * from employees;
+
+select
+    dept,
+    avg(salary) avg_salary
+from employees
+group by dept;
