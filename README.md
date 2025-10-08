@@ -1,8 +1,9 @@
 
 # Learn_SQL_Snowflake
-This repo is for SQL learning <br>
+This repo is for SQL and Snowflake learning <br>
 *[CSV files](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/datasets)* - Download the files from here
-
+---
+# [SQL](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/SQL)
 
 *[Day-1 ](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/SQL/day01)* 
 - Learned about the Database and schema setup.
@@ -52,8 +53,15 @@ This repo is for SQL learning <br>
 - Stored Procedures
 - Stream & Tasks(Triggers)
 
+# [Snowfalke](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/Snowflake)
+--- 
+*[Day-11 ](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day11)* <br>
+- What is Snowflake
+- Snowflake Architecture
+- Creating DB, Schema, Table, and inserting data into the table.
+  
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
-This Repo is for my daily learning of SQL.
+This Repo is for my daily learning of SQL and Snowflake.
 Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/eswar-pillalamarri/) or check out my other projects on [GitHub](https://github.com/Es-war29).
