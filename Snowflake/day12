@@ -1,0 +1,142 @@
+ /*    Loading Data into Snowflake (Stages + COPY Command)  
+
+ 🧠  What Are the Stages in Snowflake?
+
+A stage is a location where Snowflake looks for files to load data from (or unload data to).
+
+Types of Stages
+Type	                | Description	                              | Example
+User Stage  	        | Default stage for your Snowflake user       | @~
+Table Stage	            | Each table has its own stage	              | @%table_name
+Internal Named Stage	| Created manually to manage files	          | @my_stage
+External Stage	        | Points to S3, Azure Blob, or GCS	          | @my_s3_stage
+
+
+*/
+-- 🧱  Create a Database, Schema & Table
+
+create or replace database snow_db;
+
+create or replace schema public;
+
+create or replace table employees(
+      emp_id INT,
+      emp_name STRING,
+      dept STRING,
+      salary NUMBER(10,2)
+);
+
+select * from employees;
+
+--📦  Create an Internal Stage
+-- A stage is like a temporary storage bucket inside Snowflake where we upload files.
+
+create or replace stage emp_stage;
+
+show stages;
+
+-- 🧾 Create a File Format
+-- File formats define how Snowflake should read your files — CSV, JSON, Parquet, etc.
+
+create or replace file format my_format
+    type = 'csv'
+    field_delimiter = ','
+    skip_header = 1;
+
+--📤 Upload File into the Stage
+-- If you have a CSV file locally, you can upload it to your stage.
+-- Go to the command prompt in your system and connect to your Snowflake account
+-- using "snowsql -a <account_name> -u <user_name>"" and type your password when it prompts
+-- select the db and schema
+-- Use the PUT command to load the file into the stage
+-- "PUT file://C:\path\to\employees.csv @emp_stage;"
+-- Then list the stage to see if the file was loaded into the stage
+
+list @emp_stage;
+
+--📥 Load Data from Stage into Table
+-- Now use the COPY INTO command to load the data
+-- Use VALIDATION_MODE before loading to check data quality
+
+COPY INTO employees
+FROM @emp_stage
+FILE_FORMAT = (FORMAT_NAME = my_format)
+--VALIDATION_MODE = 'RETURN_ERRORS'
+ON_ERROR = 'CONTINUE';
+
+-- 🧩  Verify Data
+select * from employees;
+
+--🔁  Unload (Export) Data to a Stage
+-- You can also export data from Snowflake into a stage:
+
+COPY INTO @emp_stage/emp_export.csv
+FROM employees
+FILE_FORMAT = (FORMAT_NAME = my_format)
+HEADER = TRUE;
+
+LIST @emp_stage;
+
+-- Assignment
+-- create another table and load the data into it using the table stage and the user stage
+-- Write a JOIN query to see which manager each employee reports to.
+
+
+-- creating a table 
+CREATE OR REPLACE TABLE departments (
+  dept varchar,
+  manager varchar
+);
+
+-- creating a stage 
+create or replace stage dept_stage;
+drop stage dept_stage;
+
+-- using the same file format 'my_format' which we have created earlier
+
+-- 🧩  Practice Using a User Stage (@~)
+-- Go to the command prompt in your system and connect to your Snowflake account
+-- using "snowsql -a <account_name> -u <user_name>"" and type your password when it prompts
+-- select the db and schema
+-- Use the PUT command to load the file into the stage
+-- "PUT file://C:\path\to\dept.csv @~;"
+
+-- checking the User stages
+list @~;
+
+-- loading the data into Tale from the user stage
+copy into departments
+from @~/dept.csv
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1);
+
+select * from departments;
+truncate table departments;
+
+-- 🧩  Practice Using a Table Stage (@%Table_stage)
+-- Go to the command prompt in your system and connect to your Snowflake account
+-- using "snowsql -a <account_name> -u <user_name>"" and type your password when it prompts
+-- select the db and schema
+-- Use the PUT command to load the file into the stage
+-- "PUT file://C:\path\to\dept.csv @%departments ;"
+
+-- checking the table stage 
+list @%departments;
+
+-- loading the data into Tale from the user stage
+COPY INTO departments
+FROM @%departments
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)
+ON_ERROR = 'CONTINUE';
+
+select * from departments;
+
+SELECT e.emp_name, e.dept, d.manager
+FROM employees e
+JOIN departments d
+ON e.dept = d.dept;
+
+
+
+
+
+
