@@ -1,9 +1,10 @@
 
 # Learn_SQL_Snowflake
-This repo is for SQL and Snowflake learning <br>
-*[CSV files](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/datasets)* - Download the files from here
+This repo is for SQL and Snowflake learning 
 ---
+
 # [SQL](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/SQL)
+*[CSV files](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/SQL/datasets)* - Download the SQL related files from here
 
 *[Day-1 ](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/SQL/day01)* 
 - Learned about the Database and schema setup.
@@ -52,15 +53,20 @@ This repo is for SQL and Snowflake learning <br>
 *[Day-10 ](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/SQL/day10)* <br>
 - Stored Procedures
 - Stream & Tasks(Triggers)
-
+---
 # [Snowfalke](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/Snowflake)
---- 
-*[Day-11 ](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day11)* <br>
+
+*[CSV files](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/Snowflake/datasets)* - Download the Snowflake related files from here
+
+*[Day-11](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day11)* <br>
 - What is Snowflake
 - Snowflake Architecture
 - Creating DB, Schema, Table, and inserting data into the table.
-- Learn a bit more about [Snowflake_Architecture](https://docs.snowflake.com/en/user-guide/intro-key-concepts).
-  
+- Learn a bit more about [Snowflake_Architecture](https://docs.snowflake.com/en/user-guide/intro-key-concepts) from here
+
+*[Day-12](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day12)* <br>
+ - Loading Data into Snowflake (Stages + COPY Command)  
+ - Learn a bit more about [copy_into](https://docs.snowflake.com/en/sql-reference/sql/copy-into-table) from here
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
