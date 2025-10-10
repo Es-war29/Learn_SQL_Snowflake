@@ -1,0 +1,125 @@
+/*  Snowflake SQL Essentials (Core Querying Skills) */
+
+-- 🔹  The SELECT Statement
+select * from employees;
+
+-- Retrieve only selected columns:
+select emp_id,emp_name from employees;
+
+-- Add simple filtering:
+select emp_id,emp_name from employees
+where dept ='HR';
+
+-- 🔹Filtering with Multiple Conditions
+SELECT emp_name, dept, salary
+FROM employees
+WHERE dept = 'IT' AND salary > 85000;
+
+SELECT * FROM employees
+WHERE dept IN ('HR', 'Finance');
+
+SELECT * FROM employees
+WHERE salary BETWEEN 60000 AND 80000;
+
+-- 🔹 Sorting Results
+SELECT emp_name, dept, salary
+FROM employees
+ORDER BY salary DESC;
+
+-- 🔹 Aggregations (GROUP BY)
+SELECT dept, COUNT(*) AS total_employees, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY dept;
+
+-- 🔹 HAVING Clause (Filters on Groups)
+SELECT dept, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY dept
+HAVING AVG(salary) > 70000;
+-- WHERE filters rows before grouping
+-- HAVING filters groups after aggregation
+
+-- 🔹  NULL Handling
+INSERT INTO employees VALUES (6, 'Priya', NULL, NULL);
+
+SELECT emp_name, dept,
+  COALESCE(dept, 'Unknown') AS dept_fixed
+FROM employees;
+-- COALESCE() replaces NULL with a fallback value.
+
+-- 🔹  Using Functions
+SELECT emp_name,
+       UPPER(emp_name) AS uppercase,
+       LENGTH(emp_name) AS name_length
+FROM employees;
+
+SELECT CURRENT_DATE() AS today,
+       DATEADD('day', 7, CURRENT_DATE()) AS next_week,
+       DATEADD('day', -7, CURRENT_DATE()) AS last_week;
+
+-- 🔹 Derived Columns & Aliasing
+
+SELECT emp_name,
+       salary,
+       salary * 1.10 AS increased_salary
+FROM employees;
+
+-- 🔹 Combining Tables with JOIN
+
+SELECT e.emp_name, e.dept, d.manager
+FROM employees e
+JOIN departments d
+  ON e.dept = d.dept;
+
+-- 🔹 Subqueries (Query Inside a Query)
+SELECT emp_name, dept, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+-- 🔹 Common Table Expressions (CTE)
+WITH avg_sal AS (
+  SELECT dept, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept
+)
+SELECT e.emp_name, e.dept, e.salary, a.avg_salary
+FROM employees e
+JOIN avg_sal a ON e.dept = a.dept
+WHERE e.salary > a.avg_salary;
+
+-- Top Earners
+SELECT  emp_name, dept, salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 3;
+
+-- Department Summary 
+SELECT dept,
+       COUNT(*) AS emp_count,
+       ROUND(AVG(salary), 2) AS avg_salary,
+       MAX(salary) AS max_salary
+FROM employees
+GROUP BY dept;
+
+-- Employees Earning Above Their Department’s Average
+WITH avg_dept_salary AS (
+  SELECT dept, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept
+)
+SELECT e.emp_name, e.dept, e.salary, a.avg_salary
+FROM employees e
+JOIN avg_dept_salary a ON e.dept = a.dept
+WHERE e.salary > a.avg_salary;
+
+/* 
+🧠 Key Takeaways
+| Concept       | Command                 | Purpose                     |
+| ------------- | ----------------------- | --------------------------- |
+| Filter Rows   | `WHERE`                 | Filter before aggregation   |
+| Filter Groups | `HAVING`                | Filter after aggregation    |
+| Sort Results  | `ORDER BY`              | Sort ascending/descending   |
+| Aggregations  | `COUNT(), SUM(), AVG()` | Group-based metrics         |
+| Handle NULLs  | `COALESCE()`            | Replace NULLs with defaults |
+| Readability   | `CTE (WITH)`            | Write modular queries       |
+*/
