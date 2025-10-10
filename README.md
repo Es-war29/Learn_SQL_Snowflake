@@ -67,6 +67,10 @@ This repo is for SQL and Snowflake learning
 *[Day-12](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day12)* <br>
  - Loading Data into Snowflake (Stages + COPY Command)  
  - Learn a bit more about [copy_into](https://docs.snowflake.com/en/sql-reference/sql/copy-into-table) from here
+
+ *[Day-13](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day13)* <br>
+ - Snowflake SQL Essentials
+ - 
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
