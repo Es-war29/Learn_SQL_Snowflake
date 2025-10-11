@@ -70,7 +70,12 @@ This repo is for SQL and Snowflake learning
 
  *[Day-13](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day13)* <br>
  - Snowflake SQL Essentials
-   
+ 
+ *[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
+ -Advanced Joins, Subqueries & CTEs in Snowflake
+
+
+ 
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
