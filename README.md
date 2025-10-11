@@ -72,7 +72,7 @@ This repo is for SQL and Snowflake learning
  - Snowflake SQL Essentials
  
  *[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
- -Advanced Joins, Subqueries & CTEs in Snowflake
+ - Advanced Joins, Subqueries & CTEs in Snowflake
 
 
  
