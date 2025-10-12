@@ -74,6 +74,8 @@ This repo is for SQL and Snowflake learning
  *[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
  - Advanced Joins, Subqueries & CTEs in Snowflake
 
+*[Day-15](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day15)* <br>
+ - Core Snowflake Built-in Functions
 
  
 ---
