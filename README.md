@@ -77,6 +77,12 @@ This repo is for SQL and Snowflake learning
 *[Day-15](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day15)* <br>
  - Core Snowflake Built-in Functions
 
+*[Day-16](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day16)* <br>
+ - File Format
+ - Learn a bit more about [file_format](https://docs.snowflake.com/en/sql-reference/sql/create-file-format) from here
+
+ *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
+ - Stages -- Internal  
  
 ---
 # About Me
