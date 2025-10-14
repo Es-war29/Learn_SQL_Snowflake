@@ -1,0 +1,373 @@
+//--------------------------------------- STAGES - INTERNAL ---------------------------------------                                
+
+-- A stage specifies where data files are stored (i.e., “staged”) so that the data in the files can be loaded into a table.
+-- By default, each user and table in Snowflake is automatically allocated an internal stage for staging data files 
+-- to be loaded. In addition, you can create named internal stages.
+
+-- 3 types of internal stages -- 
+//                                  1. USER  2. TABLE  3. NAMED
+
+-------------------------------------------USER STAGE--------------------------------------------
+-- each user is allocated a user stage automatically.
+-- user stages cannot be altered or dropped.
+-- This stage is a convenient option if your files will only be accessed by a single user.
+-- User stages are referenced using @~
+
+-- loading data to the USER stage using SnowSQL CLI
+   put file://C:\path\file.csv @~/staged;    
+
+-- listing a user stage 
+    list @~;
+
+------------------------------------------TABLE STAGE---------------------------------------------------------
+-- Each table has a table stage allocated to it by default for storing files
+-- Table stages have the same name as the table; e.g., a table named mytable has a stage referenced as @%mytable.
+-- table stages cannot be altered or dropped.
+-- table stages are referred to using @%
+
+-- loading data to TABLE stage 
+     put file://C:\path\file.csv @%cli_customer;    
+    
+-- showing(listing) table stage 
+     list @%cli_customer;
+     
+     
+------------------------------------------------NAMED STAGE----------------------------------------------------
+-- named stages are referred to using @
+
+-- creating a named stage
+  create or replace stage my_stage
+  file_format = my_csv_format;
+  
+-- creating a named stage by giving ff values  
+  create or replace stage my_stage
+  file_format = (type = 'CSV' field_delimiter = '|' skip_header = 1);
+
+-- loading data to NAMED stage 
+    put file://C:\path\file.csv @customer_stage;    
+    
+-- showing(listing) table stage 
+         list @customer_stage;
+*/
+
+========================================================================================================================
+/*
+---------------------------------------uploading data to the stages(USER,TABLE,NAMED)---------------------------------
+
+-- For loading from internal stages, we use 2 commands  -- 1. PUT     2. COPY
+
+-- 1. PUT -> For uploading data files from a local directory/folder to the stages( User, Table & Named stages )
+--           PUT does not support uploading files to external stages.
+
+-- syntax for uploading 
+  -- put file://<local_direct_path> @<stage_name>
+  --    parallel = 10 Auto_compress = true/ False ;
+     
+   -- example 
+   -- put file://c:\temp\data\mydata.csv @~ auto_compress=true;
+
+-- 2. COPY -> The files must already be in the stage location.
+
+-- syntax
+   -- copy into mytable
+   -- from @my_int_stage;
+   
+-- example
+    -- copy into mytable from @~/staged
+    -- file_format = (format_name = 'mycsv');
+    
+-- copy command properties    
+     -- pattern='.*/.*/.*[.]csv[.]gz'
+     -- FILES = ( '<file_name>' )
+     -- file_format = <format_name>
+     -- ON_ERROR = { CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<num>%' | ABORT_STATEMENT }
+     -- SIZE_LIMIT = <num>
+     -- PURGE = TRUE | FALSE
+     -- RETURN_FAILED_ONLY = TRUE | FALSE
+     -- MATCH_BY_COLUMN_NAME = CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+     -- ENFORCE_LENGTH = TRUE | FALSE
+     -- TRUNCATECOLUMNS = TRUE | FALSE
+     -- FORCE = TRUE | FALSE
+     -- LOAD_UNCERTAIN_FILES = TRUE | FALSE
+*/    
+------------------------------------------------------------------------------------------------
+
+-- creating a new table customers 
+CREATE OR REPLACE TABLE customers (
+    customer_pk NUMBER(38,0),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(50),
+    marital_status VARCHAR(50),
+    day_of_birth DATE,
+    birth_country VARCHAR(50),
+    email_address VARCHAR(50),
+    city_name VARCHAR(100),
+    zip_code VARCHAR(10),
+    country_name VARCHAR(100)
+);
+
+select * from customers;
+
+------------------------------ Loading File into stages ------------------------------
+
+//  uploading data file to user stage 
+
+-- open command prompt and connect to Snowflake
+-- using snowsql -a <account_name> -u <username> enter and type the passowrd
+-- select db and schema
+-- Use the put command to load the file into the user stage
+-- put file://C:\Users\eswar\Downloads\customers.csv @~/staged
+
+list @~; -- list files in user stage
+
+remove @~; -- to remove the files from the user stage
+  
+// uploading data file to table stage 
+
+-- open command prompt and connect to Snowflake
+-- using snowsql -a <account_name> -u <username> enter and type the passowrd
+-- select db and schema
+-- Use the put command to load the file into the user stage
+-- put file://C:\Users\eswar\Downloads\customers.csv @%customers
+
+list @%customers;
+remove @%customers; -- to remove the files from the table stage
+
+// uploading data file to Named Internal stage 
+
+-- create a file format
+create or replace file format my_format
+type ='csv',field_delimiter = ',', skip_header =1;
+
+-- create a stage
+create or replace stage cust_stage
+file_format = (type ='csv',field_delimiter = ',', skip_header =1);
+
+create or replace stage cust_stage
+file_format =my_format;
+
+-- open command prompt and connect to Snowflake
+-- using snowsql -a <account_name> -u <username> enter and type the passowrd
+-- select db and schema
+-- Use the put command to load the file into the user stage
+-- put file://C:\Users\eswar\Downloads\customers.csv @cust_stage
+
+
+list @cust_stage; -- list the files in named internal stage
+
+remove @cust_stage; -- to remove the files from the named stage
+  
+------------------------------ copying data from stages to table ------------------------------
+
+// copying from the user stage into the table
+
+copy into customers from @~/staged/customers
+file_format = my_format;
+
+list @~;
+
+select * from customers;
+
+// copying from the table stage into the table
+
+list @%customers;
+
+copy into customers from @%customers
+file_format = (type ='csv', field_delimiter= ',',skip_header=1 );
+
+select count(*) from customers;
+
+// copying from the named internal stage into the table
+
+list @cust_stage;
+
+copy into customers from @cust_stage
+file_format = my_format;
+
+select count(*) from customers;
+
+------------------------------ PSV and TSV Files -------------------------
+CREATE OR REPLACE TABLE customers_psv (
+    customer_pk NUMBER(38,0),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(50),
+    marital_status VARCHAR(50),
+    day_of_birth DATE,
+    birth_country VARCHAR(50),
+    email_address VARCHAR(50),
+    city_name VARCHAR(100),
+    zip_code VARCHAR(10),
+    country_name VARCHAR(100)
+);
+
+-- using the same stage and file format that we created above
+-- if you want, we can create a new stage and file format also
+
+list @cust_stage;
+
+copy into customers_psv from @cust_stage/customers1
+file_format = (type ='csv', field_delimiter = '|', skip_header = 1);
+
+select * from customers_psv;
+
+---
+CREATE OR REPLACE TABLE customers_tsv (
+    customer_pk NUMBER(38,0),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(50),
+    marital_status VARCHAR(50),
+    day_of_birth DATE,
+    birth_country VARCHAR(50),
+    email_address VARCHAR(50),
+    city_name VARCHAR(100),
+    zip_code VARCHAR(10),
+    country_name VARCHAR(100)
+);
+
+-- using the same stage and file format that we created above
+-- if you want, we can create a new stage and file format also
+
+list @cust_stage;
+
+copy into customers_tsv from @cust_stage/customers2
+file_format = (type ='csv', field_delimiter ='\t', skip_header = 1);
+
+select * from customers_tsv;
+
+============================================ SOME MORE LOADING EXAMPLES ====================================================
+// 1. Loading multiple CSV files in 1 go
+
+-- upload file to stage
+put file://path-to\customer_*.csv @cust_stage ;
+
+copy into customers
+from @cust_stage
+file_format = my_fomrat
+pattern ='.*[.]csv[.]gz' ;
+
+
+// 2. Loading big data files
+
+-- upload file to stage
+put file://path-to\customers.csv @cust_stage parallel=20;
+
+copy into customers
+from @cust_stage
+file_format = my_fomrat
+purge = true;
+
+
+// 3. Loading files with column mismatch
+put file://path-to\customers.csv @cust_stage auto_compress = false;
+
+copy into customers
+from @cust_stage
+file_format = my_fomrat
+on_error = 'CONTINUE';
+
+
+// 4. Loading files with special characters
+-- 06 scenarios 
+  
+-- 1. simple CSV file
+-- copy file from stage to table (SMPLE CSV FILE)
+  copy into customers
+  from @cust_stage/customers.csv
+  file_format = my_format
+  on_error = 'CONTINUE';
+
+-- 2. All records in double quotes
+-- file format
+  create or replace file format csv_double_q_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ',' 
+    record_delimiter = '\n' 
+    skip_header = 1 
+    field_optionally_enclosed_by = '\042' 
+    trim_space = false 
+    error_on_column_count_mismatch = true
+-- copy file from stage to table
+   copy into customers
+   from @cust_stage/customers.csv
+   file_format  = csv_double_q_ff
+   on_error = 'CONTINUE';
+
+-- 3. All records in single quotes
+-- file format
+  create or replace file format csv_single_q_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ',' 
+    record_delimiter = '\n' 
+    skip_header = 1 
+    field_optionally_enclosed_by = '\047' 
+    trim_space = false 
+    error_on_column_count_mismatch = true;
+  
+ -- copy file from stage to table 
+   copy into customers
+   from @cust_stage/customers.csv
+   file_format = csv_single_q_ff
+   on_error = 'CONTINUE';
+  
+-- 4. All records in double quotes with \n
+-- file format
+   create or replace file format csv_double_q_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ',' 
+    record_delimiter = '\n' 
+    skip_header = 1 
+    field_optionally_enclosed_by = '\042' 
+    trim_space = false 
+    error_on_column_count_mismatch = true
+    escape = '\134';
+  
+-- copy file from stage to table 
+  copy into customers
+  from @cust_stage/customers.csv
+  file_format= csv_double_q_ff
+  on_error = 'CONTINUE';
+  
+-- 5. All records with mixed quotes (single & double)
+-- file format
+  create or replace file format csv_double_q_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ',' 
+    record_delimiter = '\n' 
+    skip_header = 1 
+    field_optionally_enclosed_by = '\042' 
+    trim_space = false 
+    error_on_column_count_mismatch = true
+    escape = '\134';
+  
+-- copy file from stage to table   
+  copy into customers
+  from @cust_stage/customers.csv
+  file_format = csv_double_q_ff
+  on_error = 'CONTINUE';
+  
+-- 6. All records with new lines 
+-- file format
+  create or replace file format csv_double_q_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ',' 
+    record_delimiter = '\n' 
+    skip_header = 1 
+    field_optionally_enclosed_by = '\042' 
+    trim_space = false 
+    error_on_column_count_mismatch = true
+    escape = '\134';
+  
+-- copy file from stage to table   
+  copy into customers
+  from @cust_stage/customers.csv
+  file_format = csv_double_q_ff
+  on_error = 'CONTINUE';
+
