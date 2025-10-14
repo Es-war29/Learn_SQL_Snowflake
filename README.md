@@ -85,6 +85,9 @@ This repo is for SQL and Snowflake learning
  - Stages -- External
  - Learn a bit more about [External_stages](https://docs.snowflake.com/en/user-guide/data-load-s3) from here
 
+*[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
+ - Zero-Copy Cloning
+ - Learn a bit more about [Cloning](https://docs.snowflake.com/en/sql-reference/sql/create-clone) from here
    
 ---
 # About Me
