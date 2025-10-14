@@ -60,6 +60,7 @@ create or replace file format my_format
   field_optionally_enclosed_by = '\042' -- if  double quotes were there in data
   field_optionally_enclosed_by = '\047' -- if  double quotes were there in data
   escape = '\134' -- if the data is split into new lines
+  on_error = continue
   compression = gzip
 */
 
