@@ -1,0 +1,62 @@
+ ============================================ ZERO COPY CLONING ===========================================================
+
+-- “zero-copy cloning” creates a copy of a database, schema, or table. 
+-- A snapshot of data present in the source object is taken when the clone is created, and is made available to the cloned object.
+-- The cloned object is writable and is independent of the clone source.
+
+// ADVANTAGES OF ZERO-COPY CLONING 
+ -- Zero Copy Cloning saves you on Storage costs 
+ -- Any DML update to the cloned table will not affect the source object.
+ -- Saves your Time: You usually have to wait hours, days, or even weeks to create a test or development environment 
+                                                               --    from a copy of your production data warehouse
+
+   -- cloning a table 
+select * from departments;
+
+create or replace table dept_clone
+clone departments;
+
+select * from dept_clone;
+
+-- cloning a schema
+
+create schema db_sch;
+
+create or replace schema db_sch_clone
+clone db_sch;
+
+drop schema db_sch;
+drop schema db_sch_clone;
+
+-- cloning a database
+
+create or replace database sql_learning_clone
+clone sql_learning;
+
+drop database sql_learning_clone;
+
+-- updating data in the source table and the cloned object, and observing both tables
+
+-- making changes in the source table
+select * from departments; -- 3 records
+
+-- inserting a new record in the source table
+insert into departments
+values ('sales', 'Zara');
+
+select * from departments; --4 records
+
+-- checking the cloned object
+select * from dept_clone; --3 records (no change)
+
+-- making changes in the cloned object
+select * from dept_clone; -- 3 records
+
+-- inserting a new record in the source table
+insert into dept_clone
+values ('sales', 'james'),('Service','Tim');
+
+select * from dept_clone; --5 records
+
+-- checking the source table
+select * from departments; --4 records (no change)
