@@ -1,0 +1,70 @@
+
+----------------------------------------FILE FORMAT---------------------------------------
+/*
+     Snowflake File format is a named database object that can be used to simplify the process of accessing the staged data 
+     and streamlines loading data into and unloading data out of database tables.
+     
+     format file options : 
+      Type = 'csv' , 'psv' , 'tsv' 'json' ,'xml' , 'parquet' , avro , orc  */
+            
+----------creating csv ff
+create or replace file format customer_csv_ff 
+    type = 'csv' 
+    compression = 'none' 
+    field_delimiter = ','
+    field_optionally_enclosed_by = 'none'
+    skip_header = 1 ;  
+
+
+--creating psv ff
+create or replace file format customer_psv_ff
+type='csv'
+compression ='none'
+field_delimiter='|'
+field_optionally_enclosed_by ='\042'
+skip_header=1;
+
+--creating tsv ff
+create or replace file format customer_tsv_ff
+type='csv'
+compression='none'
+field_delimiter='\t'
+field_optionally_enclosed_by='\042'
+skip_header=1;
+
+
+file format options :
+
+1. type = 'csv' / 'json'
+2. compression = AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE
+      Use --> Data loading, data unloading, and external tables
+      Default --> AUTO 
+3. Record Delimiter= '\n' '\r'
+4. Field Delimiter = ',' '|' , '\t'
+5. Field Extension = '.csv'
+6. skip_header = '1' | 'none'
+7. SKIP_BLANK_LINES = TRUE | FALSE  -- Boolean that specifies to skip any blank lines encountered in the data files;
+                                       Otherwise, blank lines produce an end-of-record error (default behavior).
+8. FIELD_OPTIONALLY_ENCLOSED_BY ='none' | '\042' 
+9. ERROR_ON_COLUMN_COUNT_MISMATCH = TRUE | FALSE
+
+--------------------------------------------------------------------------------------------
+/*
+create or replace file format my_format
+  type= 'csv'
+  field_delimiter =','
+  skip_header=1
+  field_optionally_enclosed_by="none"
+  null_if = ('null','NULL')
+  empty_field_as_null = true
+  field_optionally_enclosed_by = '\042' -- if  double quotes were there in data
+  field_optionally_enclosed_by = '\047' -- if  double quotes were there in data
+  escape = '\134' -- if the data is split into new lines
+  compression = gzip
+*/
+
+
+
+
+-- \042 --> for double quotes
+-- \047 --> for single quotes
