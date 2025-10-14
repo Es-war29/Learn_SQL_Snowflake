@@ -1,0 +1,87 @@
+// ARN -- Amazon Resource Names
+// S3 -- Simple Storage Service
+// IAM -- Integrated Account Management
+
+// AWS --> S3 , DMS(Teraform) , LAMDA 
+
+// Azure --> blobstorage, ADF, Data bricks 
+
+// Snowflake --> RBAC controls, data sharing, virtual warehouse sizing, query performance tuning, zero copy clone, 
+--               and time travel + failsafe, Search optimization, tagging 
+--               Snow park, SnowSight, SnowSQL, SnowPipe, and SnowAlert
+
+
+---------------------------------------- CREATING STORAGE OBJECT AND EXCHANGING THE ARN'S -----------------
+
+// Create storage integration object
+-- only account admins can create INTEGRATION objects
+
+create or replace storage integration s3_integration
+    type = external_stage
+    storage_provider = s3
+    enabled = TRUE
+    storage_aws_role_arn = 'arn:aws:iam::510593089103:role/snowflake_learning'
+    storage_allowed_locations = ('s3://s-3-buck-et/csv_folder/')
+    comment = 'Integration with AWS S3 buckets';
+
+// List all integrations
+SHOW STORAGE INTEGRATIONS;
+
+-- granting the usage to the sysadmin
+grant usage on integration s3_integration to role sysadmin;
+
+// Get external_id and update it in  S3 
+desc integration s3_integration; --arn:aws:iam::983003704008:user/5tt61000-s
+
+// creating a stage for the S3
+create or replace stage s3_stage
+    url = 's3://s-3-buck-et/csv_folder/'
+    storage_integration = s3_integration;
+
+// list the files in the S3 bucket
+list @s3_stage;
+
+// creating the table to upload data from S3
+
+CREATE OR REPLACE TABLE customers_s3 (
+    customer_pk NUMBER(38,0),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(50),
+    marital_status VARCHAR(50),
+    day_of_birth DATE,
+    birth_country VARCHAR(50),
+    email_address VARCHAR(50),
+    city_name VARCHAR(100),
+    zip_code VARCHAR(10),
+    country_name VARCHAR(100)
+);
+
+// creating a file format 
+create or replace file format s3_format
+    type = 'csv'
+    field_delimiter = ','
+    skip_header = 1;
+
+copy into customers_s3 from @s3_stage
+file_format = s3_format
+files = ('customers.csv');
+
+select * from customers_s3;
+
+// creating another table to load the file from s3
+
+create or replace TABLE S3_EMPLOYEES (
+	EMP_ID NUMBER(38,0),
+	EMP_NAME VARCHAR(16777216),
+	DEPT VARCHAR(16777216),
+	SALARY NUMBER(38,0),
+	HIRE_DATE DATE,
+	BONUS NUMBER(38,0)
+);
+
+copy into S3_EMPLOYEES from @s3_stage
+file_format = s3_format
+files = ('employees.csv');
+
+select * from S3_EMPLOYEES;
