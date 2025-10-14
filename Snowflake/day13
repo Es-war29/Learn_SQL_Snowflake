@@ -1,5 +1,6 @@
-/*  Snowflake SQL Essentials (Core Querying Skills) */
-
+=======================================================================================================
+/*                    Snowflake SQL Essentials (Core Querying Skills)                                */
+=======================================================================================================
 -- 🔹  The SELECT Statement
 select * from employees;
 
@@ -123,3 +124,418 @@ WHERE e.salary > a.avg_salary;
 | Handle NULLs  | `COALESCE()`            | Replace NULLs with defaults |
 | Readability   | `CTE (WITH)`            | Write modular queries       |
 */
+
+=======================================================================================================
+/*                                   Core Snowflake Built-in Functions                                */
+=======================================================================================================
+
+CREATE OR REPLACE TABLE employees (
+  emp_id INT,
+  emp_name STRING,
+  dept STRING,
+  salary NUMBER,
+  hire_date DATE,
+  bonus NUMBER
+);
+
+INSERT INTO employees VALUES
+(101, 'John', 'HR', 60000, '2019-01-10', NULL),
+(102, 'Raj', 'HR', 70000, '2020-03-12', 5000),
+(103, 'Alice', 'IT', 90000, '2018-11-05', 7000),
+(104, 'Eva', 'IT', 85000, '2021-02-20', NULL),
+(105, 'Bob', 'Finance', 75000, '2022-04-10', 3000),
+(106, 'Zara', NULL, 65000, '2023-01-01', 2000);
+
+-- 🗓️ 1️⃣ Date Functions
+
+-- Get the Current Date
+select current_date(); 
+
+-- Extract Year, Month, or Day
+SELECT 
+  emp_name,hire_date,
+  YEAR(hire_date) AS hire_year,
+  MONTH(hire_date) AS hire_month,
+  DAY(hire_date) AS hire_day
+FROM employees;
+
+-- Add / Subtract Days or Months
+SELECT 
+  emp_name,
+  hire_date,
+  DATEADD('month', 6, hire_date) AS six_months_later,
+  dateadd('month',-3, hire_date) as three_months_earlier
+FROM employees;
+
+-- Calculate Date Difference
+SELECT 
+  emp_name,hire_date,current_date(),
+  DATEDIFF('year', hire_date, CURRENT_DATE()) AS years_of_service
+FROM employees;
+
+-- 🧵 2️⃣ String Functions
+
+-- Change Case
+SELECT 
+  emp_name,
+  UPPER(emp_name) AS upper_name,
+  LOWER(emp_name) AS lower_name
+FROM employees;
+
+-- Substring & Length
+SELECT 
+  emp_name,
+  SUBSTR(emp_name, 1, 3) AS first_three_chars,
+  LENGTH(emp_name) AS name_length
+FROM employees;
+
+-- Concatenate Strings
+SELECT 
+  emp_name,
+  dept,
+  CONCAT(emp_name, ' works in ', dept, ' department') AS emp_info
+FROM employees;
+
+-- Replace / Trim
+SELECT 
+  REPLACE('emp_name', 'a', '@') AS replaced_name,
+  LTRIM('   Snowflake') AS left_trimmed,
+  RTRIM('Snowflake   ') AS right_trimmed,
+  TRIM('   Snowflake   ') AS fully_trimmed;
+
+-- ⚙️ 3️⃣ Conditional Functions
+SELECT 
+  emp_name,
+  dept, salary,
+  CASE 
+    WHEN salary >= 85000 THEN 'High Earner'
+    WHEN salary BETWEEN 70000 AND 84999 THEN 'Medium Earner'
+    ELSE 'Low Earner'
+  END AS salary_category
+FROM employees;
+
+-- IFF (Inline If)
+SELECT 
+  emp_name, salary, bonus,
+  IFF(bonus IS NULL, 'No Bonus', 'Has Bonus') AS bonus_status
+FROM employees;
+
+-- DECODE (Simpler Multi-Condition)
+SELECT 
+  emp_name, dept,
+  DECODE(dept, 
+          'IT', 'Technology',
+          'HR', 'Human Resources',
+          'Finance', 'Accounts',
+          'Other') AS dept_full_name
+FROM employees;
+
+-- 🚫 4️⃣ NULL Handling Functions
+
+--  COALESCE — Replace NULLs with Default Value
+SELECT 
+  emp_name, bonus,
+  COALESCE(bonus, 0) AS bonus_amount
+FROM employees;
+
+-- NVL (Similar to COALESCE)
+SELECT 
+  emp_name, dept, 
+  NVL(dept, 'Unassigned') AS department
+FROM employees;
+
+
+-- NULLIF — Return NULL if Two Values Match
+SELECT 
+  emp_name, dept,
+  NULLIF(dept, 'HR') AS null_if_hr
+FROM employees;
+
+-- IS NULL / IS NOT NULL Filters
+SELECT emp_name, dept, bonus,
+FROM employees
+WHERE bonus IS NULL;
+
+
+--💡 Mini Project
+/*
+Show employees with:
+    - Years of service,
+    - Salary category,
+    - Bonus adjusted to 0 if NULL,
+    - Department labeled properly.
+*/
+
+select 
+    emp_id,
+    TRIM(emp_name) emp_name,
+    nvl(dept,'Unassigned') dept,
+    salary,
+    iff(salary >70000, 'High', 'Regular') salary,
+    hire_date,
+    datediff(year,hire_date,current_date()) service_histroy,
+    nvl(bonus,0) bonus,
+    concat(emp_name,' (', dept,')') dept_label
+from employees;
+
+/* 🧠  Concept Summary
+| Category    | Function                        | Description            | Example                              |
+| ----------- | ------------------------------- | ---------------------- | ------------------------------------ |
+| Date        | `DATEADD`, `DATEDIFF`, `YEAR()` | Add or compare dates   | `DATEADD('day', 10, hire_date)`      |
+| String      | `CONCAT`, `SUBSTR`, `LENGTH`    | Text operations        | `CONCAT(first_name, ' ', last_name)` |
+| Conditional | `CASE`, `IFF`, `DECODE`         | Apply logic in queries | `IFF(salary>80000, 'High', 'Low')`   |
+| NULL        | `COALESCE`, `NVL`, `NULLIF`     | Handle missing values  | `nvl(bonus,0)`                       |
+
+*/
+
+-- 💪 Practice Tasks
+
+-- Show employees hired before 2020 and calculate how many years they’ve worked.
+select
+    emp_name,
+    hire_date,
+    datediff(year, hire_date,current_date())
+from employees
+where year(hire_date) < 2020;
+
+-- Replace all NULL department names with 'Not Assigned'.
+
+select 
+    emp_name, dept,
+    nvl(dept,'Not Assigned') dept,
+    iff(dept is null,'Not Assigned', dept) dept1,
+    NVL2(dept, dept, 'Not Assigned') dept2
+from employees;
+
+-- Create a label: 'EmployeeName (Department) - Hired in YEAR'.
+select
+    concat(emp_name,' (', nvl(dept,'N/A'),')',' - Hired in ', year(hire_date)) label
+from employees;
+
+-- Show only “High Earners” with salary > 85000 and a non-NULL bonus.
+select 
+    emp_name,
+    salary,
+    bonus,
+    'High Earner' as label
+from employees
+where salary > 85000 and bonus is not null;
+
+-- Calculate each employee’s next appraisal date = hire_date + 1 year
+select
+    emp_name,
+    hire_date,
+    dateadd(year,1,hire_date) apprisal_date
+from employees;
+
+=======================================================================================================
+/*                         Advanced Joins, Subqueries & CTEs in Snowflake                            */
+=======================================================================================================
+
+
+select * from employees;
+
+select * from departments;
+
+-- 🧠  Quick Recap — What is a JOIN?
+-- A JOIN combines rows from two or more tables based on a related column (usually a key).
+
+--🔹 INNER JOIN
+-- ✅ Returns only matching rows between both tables.
+
+select 
+    e.emp_name, e.dept, d.manager
+from employees e
+inner join departments d
+on e.dept = d.dept;
+
+-- 🔹  LEFT JOIN
+-- ✅ Returns all rows from the left table, plus matching rows from the right.
+
+SELECT e.emp_name, e.dept, d.manager
+FROM employees e
+LEFT JOIN departments d
+  ON e.dept = d.dept;
+
+-- 🔹  RIGHT JOIN
+-- ✅ Returns all rows from the right table, plus matching ones from the left.
+
+SELECT e.emp_name, e.dept, d.manager
+FROM employees e
+RIGHT JOIN departments d
+  ON e.dept = d.dept;
+
+-- 🔹  FULL OUTER JOIN
+-- ✅ Combines all records from both sides, showing NULLs where there’s no match.
+
+SELECT e.emp_name, e.dept AS emp_dept, d.dept AS dept_name, d.manager
+FROM employees e
+FULL OUTER JOIN departments d
+  ON e.dept = d.dept;
+
+-- 🔹  CROSS JOIN
+-- ✅ Cartesian product — every combination of both tables.
+
+SELECT e.emp_name, d.dept
+FROM employees e
+CROSS JOIN departments d;
+
+
+-- 🔹 SELF JOIN
+-- ✅ Join a table to itself — useful for hierarchical data (e.g., manager-employee relationships).
+
+CREATE OR REPLACE TABLE emp_hierarchy (
+  emp_id INT,
+  emp_name STRING,
+  manager_id INT
+);
+
+INSERT INTO emp_hierarchy VALUES
+(1, 'John', NULL),
+(2, 'Alice', 1),
+(3, 'Bob', 1),
+(4, 'Eva', 2),
+(5, 'Raj', 3);
+
+SELECT e.emp_name AS employee,
+       m.emp_name AS manager
+FROM emp_hierarchy e
+LEFT JOIN emp_hierarchy m
+  ON e.manager_id = m.emp_id;
+
+-- 🧩  Subqueries (Nested Queries)
+
+SELECT emp_name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+SELECT dept, MAX(avg_salary) AS top_avg
+FROM (
+  SELECT dept, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept
+) sub
+GROUP BY dept;
+
+-- 🧩 Common Table Expressions (CTEs)
+-- ✅ CTEs (WITH) make queries readable and reusable.
+
+-- Average Salary by Department
+WITH avg_sal AS (
+  SELECT dept, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept
+) 
+SELECT e.emp_name, e.dept, e.salary, a.avg_salary
+FROM employees e
+JOIN avg_sal a ON e.dept = a.dept
+WHERE e.salary > a.avg_salary;
+
+-- Multi-CTE Query
+WITH dept_count AS (
+  SELECT dept, COUNT(*) AS emp_count
+  FROM employees
+  GROUP BY dept
+),
+high_salary AS (
+  SELECT emp_name, dept, salary
+  FROM employees
+  WHERE salary > 80000
+)
+SELECT h.emp_name, h.dept, h.salary, d.emp_count
+FROM high_salary h
+JOIN dept_count d
+  ON h.dept = d.dept;
+
+/* 🧩 Analytical Use Cases (Real-World Examples) */
+
+-- 🧠 Find the Top 2 Highest-Paid Employees per Department
+SELECT *
+FROM (
+  SELECT emp_name, dept, salary,
+         ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rank
+  FROM employees
+)
+WHERE rank <= 2;
+
+-- 🧠 Find Employees Not Assigned to Any Department
+SELECT emp_name
+FROM employees
+WHERE dept NOT IN (SELECT dept FROM departments) or dept IS NULL;
+
+-- 🧠 Department-Wise Salary Comparison
+WITH dept_avg AS (
+  SELECT dept, AVG(salary) AS avg_sal
+  FROM employees
+  GROUP BY dept
+)
+SELECT e.emp_name, e.dept, e.salary, d.avg_sal,
+       CASE WHEN e.salary > d.avg_sal THEN 'Above Avg' ELSE 'Below Avg' END AS salary_level
+FROM employees e
+JOIN dept_avg d ON e.dept = d.dept;
+
+
+
+/* 🧠 Challenge — Practice Problems */
+
+-- List employees who earn the highest salary in each department.
+
+select * from (
+SELECT emp_name, dept, salary,
+         ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rank
+FROM employees)
+where rank =1;
+
+-- Find departments that have no employees assigned.
+SELECT dept, manager
+FROM departments
+WHERE dept NOT IN (SELECT DISTINCT dept FROM employees WHERE dept IS NOT NULL);
+
+
+-- Find employees who earn more than the average of all IT department employees.
+
+select 
+    emp_name, dept, salary, 
+    --avg(salary) over(partition by dept order by salary) avg_salary
+from employees
+where salary > (select avg(salary) from employees where dept = 'IT');
+
+
+-- Using a CTE, calculate each department’s total salary and list only those above 150,000.
+
+WITH dept_salary AS (
+  SELECT dept, SUM(salary) AS total_salary
+  FROM employees
+  GROUP BY dept
+)
+SELECT *
+FROM dept_salary
+WHERE total_salary > 150000;
+
+
+with cte  as (
+select 
+   dept,sum(salary) over(partition by dept) dept_sum
+from employees
+)
+select * from cte 
+where dept_sum > 150000;
+
+-- Join employees and departments to show: employee name, department name, manager name.
+
+select 
+    e.emp_name, d.dept, d.manager
+from employees e
+left join departments d
+on e.dept = d.dept;
+
+--💡 Key Takeaways
+| Concept      | Keyword             | Description               |
+| ------------ | ------------------- | ------------------------- |
+| `INNER JOIN` | Matches both sides  | Only common data          |
+| `LEFT JOIN`  | Keep all from left  | Missing right side → NULL |
+| `RIGHT JOIN` | Keep all from right | Missing left side → NULL  |
+| `FULL JOIN`  | All data            | Both sides                |
+| `CROSS JOIN` | Cartesian product   | Every combination         |
+| `SELF JOIN`  | Table joins itself  | Hierarchies               |
+| `CTE`        | `WITH` clause       | Modular queries           |
