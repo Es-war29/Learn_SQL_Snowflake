@@ -70,22 +70,18 @@ This repo is for SQL and Snowflake learning
 
  *[Day-13](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day13)* <br>
  - Snowflake SQL Essentials
- 
- *[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
- - Advanced Joins, Subqueries & CTEs in Snowflake
-
-*[Day-15](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day15)* <br>
  - Core Snowflake Built-in Functions
-
-*[Day-16](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day16)* <br>
+ - Advanced Joins, Subqueries & CTEs in Snowflake
+ 
+*[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
  - File Format
  - Learn a bit more about [file_format](https://docs.snowflake.com/en/sql-reference/sql/create-file-format) from here
 
- *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
+ *[Day-15](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day15)* <br>
  - Stages -- Internal
  - Learn a bit more about [stages](https://docs.snowflake.com/en/sql-reference/sql/create-stage) from here
 
- *[Day-18](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day18)* <br>
+ *[Day-16](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day16)* <br>
  - Stages -- External
  - Learn a bit more about [External_stages](https://docs.snowflake.com/en/user-guide/data-load-s3) from here
 
