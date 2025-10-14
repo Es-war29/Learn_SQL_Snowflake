@@ -84,7 +84,12 @@ This repo is for SQL and Snowflake learning
  *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
  - Stages -- Internal
  - Learn a bit more about [stages](https://docs.snowflake.com/en/sql-reference/sql/create-stage) from here
- 
+
+ *[Day-18](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day18)* <br>
+ - Stages -- External
+ - Learn a bit more about [External_stages](https://docs.snowflake.com/en/user-guide/data-load-s3) from here
+
+   
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
