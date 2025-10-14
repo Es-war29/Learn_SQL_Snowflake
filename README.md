@@ -82,7 +82,8 @@ This repo is for SQL and Snowflake learning
  - Learn a bit more about [file_format](https://docs.snowflake.com/en/sql-reference/sql/create-file-format) from here
 
  *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
- - Stages -- Internal  
+ - Stages -- Internal
+ - Learn a bit more about [stages](https://docs.snowflake.com/en/sql-reference/sql/create-stage) from here
  
 ---
 # About Me
