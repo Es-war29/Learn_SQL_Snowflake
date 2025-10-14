@@ -1,0 +1,21 @@
+customer_pk,first_name,last_name,gender,marital_status,day_of_birth,birth_country,email_address,city_name,zip_code,country_name
+1,Sophia,Garcia,F,W,1993-01-13,USA,sophia.garcia@example.com,Toronto,400001,USA
+2,Olivia,Wilson,F,S,1978-04-19,India,olivia.wilson@example.com,Toronto,M5B1W8,India
+3,Alexander,Moore,F,W,1977-02-07,Australia,alexander.moore@example.com,London,10001,Australia
+4,Olivia,Taylor,F,S,1996-02-20,Australia,olivia.taylor@example.com,London,10001,Australia
+5,Liam,Gonzalez,F,S,1993-06-05,Canada,liam.gonzalez@example.com,Mumbai,10001,Canada
+6,Isabella,Moore,F,S,1979-09-07,UK,isabella.moore@example.com,New York,EC1A1BB,UK
+7,Emma,Moore,F,D,1976-09-14,India,emma.moore@example.com,Sydney,EC1A1BB,India
+8,John,Smith,M,W,1999-10-10,Australia,john.smith@example.com,Toronto,10001,Australia
+9,Charlotte,Williams,F,D,1984-10-21,USA,charlotte.williams@example.com,Sydney,M5B1W8,USA
+10,Mason,Miller,F,S,1977-03-02,India,mason.miller@example.com,Sydney,400001,India
+11,Sophia,Wilson,M,W,1991-12-25,USA,sophia.wilson@example.com,Mumbai,10001,USA
+12,Evelyn,Wilson,M,M,1986-07-15,UK,evelyn.wilson@example.com,Toronto,10001,UK
+13,Mason,Anderson,M,S,1994-03-03,UK,mason.anderson@example.com,New York,2000,UK
+14,Lucas,Thomas,F,D,1981-07-05,USA,lucas.thomas@example.com,Toronto,M5B1W8,USA
+15,John,Taylor,M,M,1999-12-04,India,john.taylor@example.com,Mumbai,2000,India
+16,Emma,Martinez,M,S,1995-08-03,USA,emma.martinez@example.com,Toronto,2000,USA
+17,Logan,Smith,M,W,1978-11-25,UK,logan.smith@example.com,Sydney,10001,UK
+18,Mia,Jones,F,W,1977-02-05,USA,mia.jones@example.com,Sydney,EC1A1BB,USA
+19,Isabella,Rodriguez,F,M,1975-05-10,UK,isabella.rodriguez@example.com,Sydney,EC1A1BB,UK
+20,Ava,Brown,F,M,1988-02-01,India,ava.brown@example.com,Sydney,10001,India

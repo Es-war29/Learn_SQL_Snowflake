@@ -1,0 +1,21 @@
+customer_pk	first_name	last_name	gender	marital_status	day_of_birth	birth_country	email_address	city_name	zip_code	country_name
+1	Emma	Rodriguez	F	S	1976-12-24	India	emma.rodriguez@example.com	Toronto	M5B1W8	India
+2	Elijah	Johnson	F	S	1994-10-10	Canada	elijah.johnson@example.com	London	M5B1W8	Canada
+3	Lucas	Thomas	M	S	1991-08-16	India	lucas.thomas@example.com	Toronto	400001	India
+4	Mia	Williams	M	M	1995-03-19	India	mia.williams@example.com	Sydney	2000	India
+5	Lucas	Garcia	F	M	1977-10-24	Australia	lucas.garcia@example.com	London	400001	Australia
+6	Olivia	Lopez	F	W	1984-11-10	UK	olivia.lopez@example.com	Toronto	400001	UK
+7	Lucas	Taylor	F	W	1978-11-02	UK	lucas.taylor@example.com	Sydney	2000	UK
+8	Lucas	Williams	F	M	1981-04-09	Canada	lucas.williams@example.com	Mumbai	M5B1W8	Canada
+9	Amelia	Gonzalez	M	S	1994-12-03	Australia	amelia.gonzalez@example.com	London	2000	Australia
+10	Charlotte	Smith	F	D	1976-12-15	UK	charlotte.smith@example.com	Mumbai	M5B1W8	UK
+11	Amelia	Taylor	F	W	1997-11-06	Australia	amelia.taylor@example.com	London	400001	Australia
+12	James	Taylor	F	S	1986-01-07	USA	james.taylor@example.com	London	400001	USA
+13	Logan	Martin	F	W	1993-01-18	India	logan.martin@example.com	Mumbai	2000	India
+14	Lucas	Hernandez	F	D	1993-11-12	Australia	lucas.hernandez@example.com	Mumbai	400001	Australia
+15	John	Hernandez	F	W	1984-01-10	USA	john.hernandez@example.com	Mumbai	400001	USA
+16	Harper	Johnson	F	D	1988-03-11	India	harper.johnson@example.com	New York	EC1A1BB	India
+17	Elijah	Brown	F	S	1985-10-10	India	elijah.brown@example.com	New York	400001	India
+18	Isabella	Moore	M	D	1998-12-03	Australia	isabella.moore@example.com	London	M5B1W8	Australia
+19	Evelyn	Jones	M	W	1989-07-07	Canada	evelyn.jones@example.com	New York	10001	Canada
+20	Evelyn	Jones	F	M	1986-02-10	Australia	evelyn.jones@example.com	London	10001	Australia

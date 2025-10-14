@@ -1,0 +1,21 @@
+customer_pk|first_name|last_name|gender|marital_status|day_of_birth|birth_country|email_address|city_name|zip_code|country_name
+1|Sophia|Thomas|M|M|1984-03-26|USA|sophia.thomas@example.com|Toronto|400001|USA
+2|Mia|Thomas|M|W|1983-08-02|India|mia.thomas@example.com|London|400001|India
+3|Alexander|Garcia|F|S|1979-05-27|Canada|alexander.garcia@example.com|London|M5B1W8|Canada
+4|Amelia|Martin|M|M|1977-05-11|Australia|amelia.martin@example.com|Mumbai|10001|Australia
+5|Olivia|Rodriguez|F|M|1980-12-03|India|olivia.rodriguez@example.com|Mumbai|2000|India
+6|James|Davis|F|S|1989-06-08|Canada|james.davis@example.com|Sydney|EC1A1BB|Canada
+7|Charlotte|Jackson|F|W|1994-03-16|USA|charlotte.jackson@example.com|Mumbai|10001|USA
+8|Logan|Anderson|M|W|1999-05-25|USA|logan.anderson@example.com|New York|2000|USA
+9|Olivia|Rodriguez|F|D|1987-05-01|India|olivia.rodriguez@example.com|New York|10001|India
+10|Noah|Anderson|F|D|1998-06-16|India|noah.anderson@example.com|Toronto|M5B1W8|India
+11|Olivia|Williams|F|W|1993-08-11|USA|olivia.williams@example.com|Toronto|10001|USA
+12|Sophia|Smith|M|S|1985-05-23|USA|sophia.smith@example.com|Toronto|M5B1W8|USA
+13|Ethan|Williams|M|D|1985-11-08|Canada|ethan.williams@example.com|New York|EC1A1BB|Canada
+14|Evelyn|Moore|F|D|1982-09-14|Canada|evelyn.moore@example.com|Sydney|2000|Canada
+15|Sophia|Brown|F|W|1978-08-02|UK|sophia.brown@example.com|New York|EC1A1BB|UK
+16|Elijah|Johnson|M|S|1975-07-28|India|elijah.johnson@example.com|Toronto|400001|India
+17|Ethan|Hernandez|M|D|1991-11-21|UK|ethan.hernandez@example.com|Toronto|2000|UK
+18|Isabella|Wilson|F|M|1992-07-26|Canada|isabella.wilson@example.com|Mumbai|2000|Canada
+19|Emma|Martinez|F|W|1980-01-27|India|emma.martinez@example.com|Sydney|400001|India
+20|Mia|Anderson|F|D|1979-09-10|USA|mia.anderson@example.com|New York|2000|USA
