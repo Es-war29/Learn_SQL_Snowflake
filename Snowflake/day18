@@ -1,0 +1,133 @@
+/*                                   Time Travel                                                    */
+/*
+Time Travel --> Snowflake Time Travel enables accessing historical data (i.e., data that has been changed or deleted) at any point
+                within a defined period. It serves as a powerful tool for performing the following tasks:
+
+RETENSION PERIOD --> The data retention period specifies the number of days for which this historical data is preserved and,
+                     therefore, Time Travel operations (SELECT, CREATE … CLONE, UNDROP) can be performed on the data.
+
+FAIL SAFE --> Fail-safe provides a (non-configurable) 7-day period during which historical data may be recoverable by Snowflake.
+          --  This period starts immediately after the Time Travel retention period ends.
+
+Time Travel syntax :
+   
+   SELECT ...
+FROM ...
+  {
+   AT( { TIMESTAMP => <timestamp> | OFFSET => <time_difference> | STATEMENT => <id> | STREAM => '<name>' } ) |
+   BEFORE( STATEMENT => <id> )
+  }
+[ ... ]
+
+
+Time Travel options : 
+    
+  TIMESTAMP => <timestamp>  ==> Specifies an exact date and time to use for Time Travel. Note that the value must be explicitly cast to a TIMESTAMP.
+  OFFSET => <time_difference>  ==> Specifies the difference in seconds from the current time to use for Time Travel
+  STATEMENT => <id> ==>  Specifies the query ID of a statement to use as the reference point for Time Travel. 
+  STREAM => '<name>' ==> Specifies the identifier (i.e., name) for an existing stream on the queried table or view.         
+                         
+
+
+ 1. For Standard edition: 
+                --> The standard retention period is 1 day (24 hours) and is automatically enabled for all Snowflake accounts:
+
+ 2. For Snowflake Enterprise Edition (and higher):
+                                        --> The retention period can be set to any value from 0 up to 90 days.
+
+Enable time travel : 
+                 DATA_RETENTION_TIME_IN_DAYS = 1;
+                 
+Disable time travel :
+                 DATA_RETENTION_TIME_IN_DAYS = 0;
+
+*/
+
+-- setting time travel for a table
+create or replace table employee_json(id int)
+data_retention_time_in_days = 10;
+
+-- setting time travel for a schema
+create or replace schema time_
+data_retention_time_in_days = 1;
+
+-- setting time travel for a database
+create or replace database time_
+data_retention_time_in_days = 1;
+
+-- altering retention period of table
+
+alter table employee_json
+set data_retention_time_in_days =5;
+
+
+-- listing the retention period
+
+show tables like 'employee_json'; -- retention_time =5 as we have altered above
+show tables like 'customers_psv'; -- retention_time =1 this is for a normal table where we haven't given any retention time during creation
+
+show schemas like 'time_'; -- retention_time =1
+show databases like 'time_'; -- retention_time =1
+
+-- dropping the created table, schema, and databases
+drop database time_;
+drop schema time_;
+drop table employee_json;
+
+-- restoring schema and database
+undrop schema time_;
+undrop database time_;
+
+
+
+---------------------------------------------------------------
+------------------ Time Travel Options -----------------------
+-- 1. Offset       2. Timestamp              3. Before ID
+
+
+-- 1. Offset
+--         It specifies how far back in time (in seconds) from the current time can go and query the data
+
+select * from employees; -- dept was null for emp_id 106 (01bfb9a0-3202-03db-000f-b376000a53ba) (10/15/2025, 4:42:06 PM)
+
+update employees
+set dept = 'sales'
+where emp_id = 106; -- 1 row was updated on Oct 15, 4:44 PM 
+
+select * from employees; -- dept updated as sales for emp_id 106
+
+-- querying historical data with offset
+select * from employees 
+at (offset => -60*5); -- It shows the dept was nul for emp_id 106
+
+-- 2. Timestamp
+--      It lets you query data as it existed at an exact point in time(using datetime values)
+
+select * from employees; -- dept updated as sales for emp_id 106
+
+-- querying historical data with timestamp
+select * from employees
+at (timestamp => '2025-10-15 04:04:06'); -- dept is null for emp_id 106
+
+select current_timestamp(); -- 2025-10-15 04:26:19.226 -0700
+
+
+-- 3.Before ID
+--      Before(statemed => 'Quey_ID')
+--      It restores or queries the data as it was before the execution of the specific query with the given Query_ID
+
+
+select * from employees; -- dept updated as sales for emp_id 106
+
+-- querying historical data with Before Id
+select * from employees
+before(statement=>'01bfb9a0-3202-03db-000f-b376000a53ba'); -- dept is null for the emp_id 106
+
+-- restoring tables with data
+-- we can use Offset, Timestamp, and Before ID to restore the data in a table
+
+create or replace table restore_table 
+CLONE employees before(statement=>'01bfb9a0-3202-03db-000f-b376000a53ba');
+
+select * from restore_table; -- dept is null for the emp_id 106
+
