@@ -1,6 +1,7 @@
 
 # Learn_SQL_Snowflake
 This repo is for SQL and Snowflake learning 
+
 ---
 
 # [SQL](https://github.com/Es-war29/Learn_SQL_Snowflake/tree/main/SQL)
@@ -88,7 +89,12 @@ This repo is for SQL and Snowflake learning
 *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
  - Zero-Copy Cloning
  - Learn a bit more about [Cloning](https://docs.snowflake.com/en/sql-reference/sql/create-clone) from here
-   
+
+*[Day-18](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day18)* <br>
+ - Time Travel
+ - Learn a bit more about [Time Travel](https://docs.snowflake.com/en/user-guide/data-time-travel) from here
+
+
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
