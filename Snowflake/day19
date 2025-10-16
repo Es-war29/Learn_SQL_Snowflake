@@ -1,0 +1,111 @@
+/*                                      Caching      
+    A cache is a temporary storage location that stores copies of files or data, 
+    so that they can be easily accessed faster in the near future
+
+Two types of cache 
+1. RESULTS CACHE   
+    The Result Cache stores the final results of queries that have already been executed.
+    If an identical query (including SQL text, role, and parameters) is executed again, 
+    Snowflake returns results directly from cache without re-running the query.
+
+2. LOCAL DISK CACHE
+    The Local Disk Cache (also known as Warehouse Cache) stores data blocks on the local SSD of the virtual warehouse.
+    Unlike Result Cache (which stores query results), Local Disk Cache stores raw table data to speed up future queries that scan the same data.
+
+*/
+----------------------------------------------RESULTS CACHE------------------------------
+
+
+-- Query is fetching results from Storage layer(Remote Disk) ---- 1st time --> more time
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 623ms
+
+-- 2nd run 
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 67ms
+
+-- 3rd run
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 38ms
+
+-- fetching metadata 
+select count(*) from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --39ms
+
+-- fetched the record on condition
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM
+where t_second = 56; --410ms
+
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM
+where t_time= 956; --87ms
+
+-- fetching record by giving column names & column rearranging
+
+select t_hour,t_second,t_shift
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --205 ms
+
+select t_shift,t_hour,t_second,
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --197 ms
+
+select t_shift,t_sub_shift,t_hour,t_second,t_meal_time,
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --271ms
+
+
+===========================================================================================================================
+                                    --     LOCAL DISK CACHE  -- 
+-- turn off results cache
+alter session set use_cached_result = false;
+
+-- Query is fetching results from Storage layer(Remote Disk) ---- 1st time --> more time
+
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 393ms
+
+-- 2nd run 
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 494ms
+
+-- 3rd run
+select * from 
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; -- 495ms
+
+-- fetching metadata 
+select count(*) from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --27ms
+
+-- fetched the record on condition
+select * from  --212ms
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM
+where t_second = 56; 
+
+select * from  --84ms
+SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM
+where t_time= 956; 
+
+-- fetching record by giving column names & column rearranging
+
+select t_hour,t_second,t_shift
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --203 ms
+
+select t_shift,t_hour,t_second,
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --284ms
+
+select t_shift,t_sub_shift,t_hour,t_second,t_meal_time,
+from SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.TIME_DIM; --205ms
+
+
+-----------------------------------------------------------------------------
+/*                             Time Differences
+
+Same Query      Results cache                       Local disk cache
+1st time        623ms                               393ms 
+2nd time        67ms                                494ms 
+3rd time        38ms                                495ms
+count           39ms                                27ms
+where1          410ms                               212ms 
+where2          87ms                                84ms 
+rearrange1      205ms                               203ms 
+rearrange2      197ms                               284ms 
+newcolumns      271ms                               205ms
+
+*/
