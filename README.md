@@ -75,25 +75,28 @@ This repo is for SQL and Snowflake learning
  - Advanced Joins, Subqueries & CTEs in Snowflake
  
 *[Day-14](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day14)* <br>
- - File Format
+ - File Formats in Snowflake
  - Learn a bit more about [file_format](https://docs.snowflake.com/en/sql-reference/sql/create-file-format) from here
 
  *[Day-15](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day15)* <br>
- - Stages -- Internal
+ - Stages -- Internal in Snowflake
  - Learn a bit more about [stages](https://docs.snowflake.com/en/sql-reference/sql/create-stage) from here
 
  *[Day-16](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day16)* <br>
- - Stages -- External
+ - Stages -- External in Snowflake
  - Learn a bit more about [External_stages](https://docs.snowflake.com/en/user-guide/data-load-s3) from here
 
 *[Day-17](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day17)* <br>
- - Zero-Copy Cloning
+ - Zero-Copy Cloning in Snowflake
  - Learn a bit more about [Cloning](https://docs.snowflake.com/en/sql-reference/sql/create-clone) from here
 
 *[Day-18](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day18)* <br>
- - Time Travel
+ - Time Travel in Snowflake
  - Learn a bit more about [Time Travel](https://docs.snowflake.com/en/user-guide/data-time-travel) from here
 
+*[Day-19](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day19)* <br>
+ - Cache in Snowflake
+ - Learn a bit more about [cache](https://docs.snowflake.com/en/user-guide/performance-query-warehouse-cache) from here
 
 ---
 # About Me
