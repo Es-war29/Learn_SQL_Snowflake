@@ -98,6 +98,11 @@ This repo is for SQL and Snowflake learning
  - Cache in Snowflake
  - Learn a bit more about [cache](https://docs.snowflake.com/en/user-guide/performance-query-warehouse-cache) from here
 
+*[Day-20](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day20)* <br>
+ - Data Unloading in Snowflake
+ - Learn a bit more about [unloading data ](https://docs.snowflake.com/en/guides-overview-unloading-data) from here
+
+
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
