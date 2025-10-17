@@ -1,0 +1,135 @@
+/*                                     Unloading data in Snowflake
+
+-- Unloading data to external cloud storage locations:
+    -- Unloading the data in Snowflake means exporting data from Snowflake tables into external tables (S3, Blob, cloud storage)
+
+Unloading Options:
+    OVERWRITE = TRUE | FALSE - Specifies to overwrite existing files
+    SINGLE = TRUE | FALSE - Specifies whether to generate a single file or multiple files
+    MAX_FILE_SIZE = NUMBER - Maximum file size
+    INCLUDE_QUERY_ID = TRUE | FALSE - Specifies whether to uniquely identify unloaded files by including a universally unique identifier
+    DETAILED_OUTPUT = TRUE | FALSE - Shows the path and name for each file, its size, and the number of rows that were unloaded to the file.;
+
+*/
+
+// creating a storage integration object
+
+create or replace storage integration integration_s3
+    type = external_stage
+    storage_provider = s3
+    enabled = TRUE
+    storage_aws_role_arn = 'arn:aws:iam::510593089103:role/snowflake_learning'
+    storage_allowed_locations = ('s3://s-3-buck-et/csv_folder/','s3://s-3-buck-et/unloading/')
+    comment = 'Integration with AWS S3 buckets';
+
+// List all integrations
+SHOW STORAGE INTEGRATIONS;
+
+-- granting the usage to the sysadmin
+grant usage on integration integration_s3 to role sysadmin;
+
+// Get  aws_iam_ueser_arn and update it in  S3 
+desc integration integration_s3; --arn:aws:iam::983003704008:user/5tt61000-s
+
+
+-- If you have already created storage integration earlier, then use alter to set the storage location
+-- altering storage integration
+ALTER STORAGE INTEGRATION integration_s3
+  SET STORAGE_ALLOWED_LOCATIONS = ('s3://s-3-buck-et/unloading/');
+
+
+-- create a file format
+create or replace file format unload_s3
+    type = 'csv'
+    field_delimiter = '|'
+    skip_header = 0
+    empty_field_as_null = True;
+
+-- create a stage
+create or replace stage unload_s3_stage
+    url = 's3://s-3-buck-et/unloading/'
+    storage_integration = integration_s3
+    file_format = unload_s3;
+
+
+-- unloading the data to the external stage from Snowflake table
+copy into @unload_s3_stage
+from customers_psv;
+
+-- seeing the files in the stage
+list @unload_s3_stage;
+
+-- the file was uploaded into the AWS S3 also
+
+-- naming the file as cust
+copy into @unload_s3_stage/cust
+from customers_psv;
+
+-- copy command for unloading data to ext stage -- max file size , overwrite
+copy into @unload_s3_stage/cust1
+from customers_psv
+max_file_size = 5000 --setting the file size to max 5kb
+overwrite =true;
+
+-- copy command for unloading data to ext stage -- single
+copy into @unload_s3_stage/cust2
+from customers_psv
+max_file_size = 5000
+overwrite =true
+single = true;
+
+-- copy command for unloading data to ext stage -- detailed output
+copy into @unload_s3_stage/cust3
+from customers_psv
+max_file_size = 5000
+overwrite =true
+single = true
+detailed_output = true;
+
+ list @unload_s3_stage;
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+ -- UNLOADING DATA TO INTERNAL STAGE FROM SNOWFLAKE
+
+ // create a file format
+ create or replace file format unload_format
+    type = 'csv'
+    field_delimiter = '|'
+    skip_header = 0
+    empty_field_as_null = True;
+
+// create a stage
+create or replace stage unload_stage
+    file_format = unload_format;
+
+// copying files into internal stage from snowflake table
+copy into @unload_stage
+from customers_psv
+overwrite=true
+single=true 
+detailed_output=true; 
+
+list @unload_stage;
+
+-- naming the file as cu
+copy into @unload_stage/cu
+from customers_psv
+overwrite=true
+single=true 
+detailed_output=true; 
+
+
+-- open command prompt and link Snowflake 
+-- using snowsql -a <accountname> -u <username>
+-- type the password
+-- select the DB and schema
+
+// downloading file to local system by using GET command   
+-- GET @unload_stage/cu file://path-to-store --named stage
+
+//downloading file from @%table stage    -- @% symbol for table stage
+-- GET @%table_stage/cu  file://path-to-store
+
+//downloading file from @~user stage     --@~  for user stage
+-- GET @~user_stage/cu file://path-to-store
