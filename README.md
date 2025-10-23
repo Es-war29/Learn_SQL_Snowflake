@@ -104,7 +104,7 @@ This repo is for SQL and Snowflake learning
 
 *[Day-21](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day21)* <br>
  - Data sharing in Snowflake
- - Learn a bit more about [Data Sharing]([https://docs.snowflake.com/en/guides-overview-unloading-data](https://docs.snowflake.com/en/user-guide/data-sharing-intro)) from here
+ - Learn a bit more about [Data Sharing]([https://docs.snowflake.com/en/guides-overview-unloading-data](https://docs.snowflake.com/en/user-guide/data-sharing-intro) from here
 
 ---
 # About Me
