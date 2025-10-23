@@ -1,0 +1,155 @@
+------------------------------------------DATA SHARING TO SNOWFLAKE USERS--------------------------------------------
+
+-- data share properties -- 
+-- grant usage --  database , schema
+-- grant select -- tables 
+
+
+--creating database data_sharing 
+create or replace database share_db;
+
+-- create a schema
+create or replace schema shares;
+
+
+-- creating table
+CREATE OR REPLACE TABLE customers_share (
+    customer_pk NUMBER(38,0),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(50),
+    marital_status VARCHAR(50),
+    day_of_birth DATE,
+    birth_country VARCHAR(50),
+    email_address VARCHAR(50),
+    city_name VARCHAR(100),
+    zip_code VARCHAR(10),
+    country_name VARCHAR(100)
+);
+
+-- creating a file format for loading
+CREATE OR REPLACE FILE FORMAT ff_share
+	TYPE = csv
+    field_delimiter = '|'
+	SKIP_HEADER = 1;
+
+    
+// Create storage integration object
+-- only account admins can create INTEGRATION objects
+
+use role accountadmin;
+create or replace storage integration s3_integration
+    type = external_stage
+    storage_provider = s3
+    enabled = TRUE
+    storage_aws_role_arn = 'arn:aws:iam::510590389013:role/snowflake_learning'
+    storage_allowed_locations = ('s3://s-3-buck-et/csv_folder/')
+    comment = 'Integration with AWS S3 buckets';
+
+// List all integrations
+SHOW STORAGE INTEGRATIONS;
+
+-- granting the usage to the sysadmin
+grant usage on integration s3_integration to role sysadmin;
+
+use role sysadmin;
+
+// Get aws_iam_ueser_arn and update it in  S3 
+desc integration s3_integration; --arn:aws:iam::983007704808:user/5tt612300-s
+
+// creating a stage for the S3
+create or replace stage s3_stage
+    url = 's3://s-3-buck-et/csv_folder/'
+    storage_integration = s3_integration;
+
+// list the files in the S3 bucket
+list @s3_stage;
+
+copy into share_db.shares.customers_share
+from @s3_stage
+file_format= ff_share
+files = ('customers1.psv') ;
+
+select * from share_db.shares.customers_share;
+
+
+ -------------------------  things to do in sender's account (provider account)  ---------------------------------
+ 
+ --creating share
+ // shares can be done only by the account admin
+use role accountadmin;
+
+create or replace share coding_share;
+
+-- list shares
+show shares;
+
+--granting permission to share the use of the database
+grant usage on database share_db to share coding_share;
+
+--granting permission to the schema to use the share
+grant usage on schema share_db.shares to share coding_share;
+
+--granting permission to the table to use the share
+grant select on table share_db.shares.customers_share to share coding_share;
+
+--granting permission to use the complete schema 'share'
+grant select on all tables in schema shares to share coding_share;
+
+--granting permission to use the complete database 'share_db'
+grant select on all tables in database share_db to share coding_share;
+
+-- checking(showing) grants 
+show grants to share coding_share;
+
+/* the provider and consumer should be in the same cloud provider region */
+select current_region(); -- AWS_AP_SOUTHEAST_1 -> provider's region
+
+-- create an account fora  consumer for the same region
+select current_region(); -- AWS_AP_SOUTHEAST_1 -> consumer's region
+
+-- giving an account name and access to the share to this account
+Alter share coding_share add account = OETTGWG.MM39687;
+
+-- example: HUZYXPV.RU36749 -> provider's  account name
+-- example: OETTGWG.MM39687 -> consumer's account name
+-- you can find in the Snowflake account details
+
+--------------------------------things to do in CONSUMER (receiver's) snowflake account---------------
+
+--listing all shares in receiver's account
+show shares;
+-- 2025-10-23 07:53:13.072 -0700 |	INBOUND |	HUZYXPV.RU36749 |	CODING_SHARE |	HUZYXPV_RU36749_CODING_SHARE	|				
+
+--describing share
+desc share <account_name>.<share_name>;
+desc share HUZYXPV_RU36749.CODING_SHARE;
+
+-- Result:
+-- DATABASE	HUZYXPV_RU36749_CODING_SHARE	2025-10-23 07:53:40.563 -0700
+-- SCHEMA	HUZYXPV_RU36749_CODING_SHARE.SHARES	2025-10-23 07:53:43.480 -0700
+-- TABLE	HUZYXPV_RU36749_CODING_SHARE.SHARES.CUSTOMERS_SHARE	2025-10-23 07:53:47.507 -0700
+
+
+-- creating database from sender's account
+
+-- option 1:
+create or replace database share_data from share HUZYXPV_RU36749.CODING_SHARE;
+
+
+-- option 2: 
+
+-- Path: Data Sharing > Private Sharing > Use can see the 'Consumer_share' from the provider 
+-- You can download the data and see it in a worksheet
+-- Here, the database name will be of provider account name.share name
+
+--verifying data in receiver's account
+select * from HUZYXPV_RU36749_CODING_SHARE.SHARES.CUSTOMERS_SHARE; -- can see data
+
+drop table  HUZYXPV_RU36749_CODING_SHARE.SHARES.CUSTOMERS_SHARE; 
+-- Insufficient privileges to operate on table 'CUSTOMERS_SHARE'.
+
+/* Even with the change of data in the provider's account table, it will reflect in the consumer's data */
+
+
+
