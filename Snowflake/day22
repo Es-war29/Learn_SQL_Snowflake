@@ -1,0 +1,143 @@
+/*
+=============================INTERNAL TABLES====================================
+
+==============================================================================
+                   TYPES OF TABLES  - 1. PERMANENT TABLE  2. TRANSIENT TABLE  3. TEMPORARY TABLE
+=============================================================================
+*/
+
+-- creating a schema 
+create or replace schema table_types;                          
+                          
+-- Where to see table type
+SHOW TABLES in SCHEMA public;
+
+-- creating permanent, transient, temporary table 
+create or replace table permanent_table(id number);
+CREATE OR REPLACE TRANSIENT TABLE tran_table(id number);
+CREATE OR REPLACE TEMPORARY TABLE temp_table(id number);
+
+-- Where to see table type
+SHOW TABLES in SCHEMA table_types;
+-- In the result, see the 'kind' column to see the table types
+
+
+-------------------------- PERMANENT Tables/Schemas ---------------------------
+
+create or replace table permanent_table(id number);   -- it's just normal table we create
+
+-- Default table type in Snowflake
+-- These are the regular and common tables
+-- Tables exist until we drop them explicitly
+-- Time travel retention period is 0-90 days, depending on Snowflake edition
+-- 7 days of fail-safe period
+
+
+--------------------------------- Transient Tables/Schemas -------------------------------
+
+-- Similar to Permanent tables but with 1 1-day retention period
+-- No fail-safe period
+-- Tables exist until we drop them explicitly
+-- Useful when data protection is not required
+-- Defining stage tables as Transient is best practice 
+
+
+-- creating a transient table
+create or replace table tran_table(id number);
+
+-- create transient schema 
+create or replace transient schema tran_schema;   -- all tables in the transient schema will be transient by default
+
+-- syntax for creating a transient table
+create or replace table tran_schema.tran_table(id number);
+
+SHOW TABLES in SCHEMA tran_schema;
+
+-- Can we alter the retention period of transient tables?
+alter table tran_schema.tran_table
+set data_retention_time_in_days = 2 ; 
+
+-- Can we undrop the table, sc, DB transient in 24 hours?
+use database snow_db;
+drop table tran_schema.tran_table;
+
+-- undrop this transient table within 24 hours
+undrop table tran_schema.tran_table;
+
+drop schema tran_schema;
+undrop schema tran_schema;
+
+-------------------------------------- Temporary Tables ----------------------------
+
+-- Table exists only within the session
+-- Once the session ends, the table gets dropped completely and is not recoverable.
+-- They are not visible to other users or sessions
+-- 1-day retention period
+-- No fail-safe period
+-- Useful for development work
+-- Can be used in stored procedures for intermediate data storage
+
+-- Syntax :
+    CREATE OR REPLACE TEMPORARY TABLE temp_table(id number);
+
+-- creating a schema ----- NO 
+    create or replace temporary schema temp_schema ;
+
+-- creating a database ----- NO 
+    create or replace temporary database temp_db ;
+
+-- create 1 table 
+create or replace temporary table temp_table (id number);
+
+insert into temp_table values ('5');
+insert into temp_table values ('4');
+insert into temp_table values ('8');
+insert into temp_table values ('1');
+
+select * from temp_table;  -- temp table will only be assessed from 1 session ( worksheet )
+
+-- drop and undrop
+
+drop table temp_table;
+
+undrop table temp_table;
+
+desc table temp_table;
+
+--------------------------------------SCENARIO 1-----------------------------------------------------------------
+
+create or replace temporary table temp_table (id number);
+
+alter table temp_table rename to temp_tables;
+
+undrop table temp_table;
+
+select * from temp_table;
+
+---------------------------------------SCENARIO 2------------------------------------------------------------------
+
+create or replace temporary table names1 (name string);
+
+create or replace table names1 (name string);
+
+insert into names1 values ('shivam');
+insert into names1 values ('ayushi');
+insert into names1 values ('elvish');
+insert into names1 values ('pranav');
+
+select * from names1;
+
+show tables in schema table_types;
+------------------------------ POINTS TO REMEMBER ------------------------------
+
+-- We can't convert any table to another type
+-- We can create Transient databases and Transient schemas
+-- Tables created under Transient databases/schemas are by default Transient
+-- We can create a temporary table with the same name as the Perm/Tran table. If we query with that table name, 
+--  It fetches data from the Temporary table in that session.
+
+-- How to find the table type?
+-- Look at the Kind' filed in SHOW TABLES properties
+
+-- for schema type, we have to OPTIONS column 
+show schemas in database snow_db;
