@@ -107,8 +107,11 @@ This repo is for SQL and Snowflake learning
  - Learn a bit more about [Data Sharing](https://docs.snowflake.com/en/user-guide/data-sharing-intro) from here
 
 *[Day-22](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day22)* <br>
- - Types of Tables - Internal
+ - Internal Tables
+ - External Tables
  - Learn a bit more about [Internal Tables](https://docs.snowflake.com/en/user-guide/tables-temp-transient) from here
+ - Learn a bit more about [External Tables](https://docs.snowflake.com/en/user-guide/tables-external-intro) from here
+   
 ---
 # About Me
 Hello, I am Eswar! Learning SQL through Snowflake, <br> 
