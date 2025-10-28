@@ -111,6 +111,11 @@ This repo is for SQL and Snowflake learning
  - External Tables
  - Learn a bit more about [Internal Tables](https://docs.snowflake.com/en/user-guide/tables-temp-transient) from here
  - Learn a bit more about [External Tables](https://docs.snowflake.com/en/user-guide/tables-external-intro) from here
+
+*[Day-23](https://github.com/Es-war29/Learn_SQL_Snowflake/blob/main/Snowflake/day23)* <br>
+ - Streams in Snowflake
+ - Learn a bit more about [Streams](https://docs.snowflake.com/en/user-guide/streams-intro) from here
+
    
 ---
 # About Me
